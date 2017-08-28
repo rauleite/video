@@ -1,0 +1,77 @@
+import 'babel-polyfill'
+import 'babel-core/register'
+import express from 'express'
+import log from 'debug'
+import path from 'path'
+import project from '../config/project.config'
+import bodyParser from 'body-parser'
+import passport from 'passport'
+// import localSignupStrategy from './strategies/local-signup'
+// import localLoginStrategy from './strategies/local-login'
+
+const app = express()
+
+/* Para uso de informacoes do proxy, como ler headers, para o limit-express */
+app.enable('trust proxy', true)
+app.enable('trust proxy', 'loopback')
+
+// tell the app to parse HTTP body messages
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
+
+/* pass the passport middleware */
+app.use(passport.initialize())
+
+require('./connect/server')(app)
+
+/* load passport strategies */
+passport.use('local-signup', require('./strategies/local-signup'))
+passport.use('local-login', require('./strategies/local-login'))
+
+// app.use(express.static(project.paths.public()))
+
+app.disable('x-powered-by')
+
+const redisClient = require('./connect/redis-connect')
+const limiter = require('express-limiter')(app, redisClient)
+
+/* Prevent's DDOs attack */
+
+/* Max de 75 req por 5 minutos - media de 1 req a cada 4 segundos */
+limiter({
+  path: '*',
+  method: 'all',
+  total: 75,
+  expire: 1000 * 60 * 5,
+  lookup: 'ip'
+})
+
+/* Max de 1 req a cada 2 segundos */
+limiter({
+  path: '*',
+  method: 'post',
+  total: 1,
+  expire: 1000 * 2,
+  lookup: 'ip'
+})
+
+
+// routes
+require('./modules/all-routes')(app)
+
+// This rewrites all routes requests to the root /index.html file
+// (ignoring file requests). If you want to implement universal
+// rendering, you'll want to remove this middleware.
+// app.use('*', function (req, res, next) {
+//   const filename = path.join(compiler.outputPath, 'index.html')
+//   compiler.outputFileSystem.readFile(filename, (err, result) => {
+//     if (err) {
+//       return next(err)
+//     }
+//     res.set('content-type', 'text/html')
+//     res.send(result)
+//     res.end()
+//   })
+// })
+
+module.exports = app

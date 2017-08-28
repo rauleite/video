@@ -1,0 +1,41 @@
+
+.containerNav {
+    margin: 0 auto;
+}
+
+/* navbar */
+.navbar {
+  margin: 0 auto;
+  
+  margin-bottom: 20px;
+  width: 100%;
+  /*height: auto;*/
+  background-color: #24292e;
+  line-height: 42px;  
+}
+
+/* nav links */
+.nav {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.nav li {
+  display: inline-block;
+  margin-left: 18px;
+}
+
+.navbar a {
+  color: #FFF;
+  text-decoration: none;
+}
+
+.navbar a:hover {
+  color: #CFCFCF;
+}
+
+/* if you want pull right nav links */
+.nav-right {
+  float: right;
+}

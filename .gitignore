@@ -1,0 +1,13 @@
+# See https://help.github.com/ignore-files/ for more about ignoring files.
+
+# modulo SERVER
+server/config*
+
+# modulo WEB
+web/src/**/*.css
+
+# todos modulos
+*/node_modules
+*/yarn.lock
+*/.DS_Store
+*/**/*.log

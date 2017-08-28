@@ -1,0 +1,15 @@
+$xs-min-width: 0em;
+$xs-max-width: 48em;
+
+$sm-min-width: 48.01em;
+$sm-max-width: 62em;
+
+$md-min-width: 62.01em;
+$md-max-width: 75em;
+
+$lg-min-width: 75.01em;
+
+$xs-media: "screen and (min-width: #{$xs-min-width}) and (max-width: #{$xs-max-width})";
+$sm-media: "screen and (min-width: #{$sm-min-width}) and (max-width: #{$sm-max-width})";
+$md-media: "screen and (min-width: #{$md-min-width}) and (max-width: #{$md-max-width})";
+$lg-media: "screen and (min-width: #{$lg-min-width})";

@@ -1,0 +1,305 @@
+@import 'variables';
+
+/**
+  @media only screen...
+*/
+@mixin media-only($viewport-mixin, $action) {
+  /* Se screen for xs, esconde */
+  @media only #{$viewport-mixin} {
+    @if $action == "hidden" {
+      display: none;
+      visibility: hidden;
+    }
+  }
+}
+
+/**
+  @media not screen...
+*/
+@mixin media-not($viewport-mixin, $action) {
+  /* Se screen for xs, esconde */
+  @media not #{$viewport-mixin} {
+    @if $action == "hidden" {
+      display: none;
+      visibility: hidden;
+    }
+  }
+}
+
+/**
+  Esconde todos que possuem o viewport acima
+  @media only screen...
+*/
+@mixin hidden-up($size) {
+  @if $size == "xs" {
+    @each $media in $xs-media, $sm-media, $md-media, $lg-media {
+      /* Se screen for xs, esconde */
+      @media only #{$media} {
+        display: none;
+        visibility: hidden;
+      }
+    }
+  }
+
+  @if $size == "sm" {
+    @each $media in $sm-media, $md-media, $lg-media {
+      /* Se screen for xs, esconde */
+      @media only #{$media} {
+        display: none;
+        visibility: hidden;
+      }
+    }
+  }
+
+  @if $size == "md" {
+    @each $media in $md-media, $lg-media {
+      /* Se screen for xs, esconde */
+      @media only #{$media} {
+        display: none;
+        visibility: hidden;
+      }
+    }
+  }
+
+  @if $size == "lg" {
+    @each $media in $lg-media {
+      /* Se screen for xs, esconde */
+      @media only #{$media} {
+        display: none;
+        visibility: hidden;
+      }
+    }
+  }
+}
+
+/**
+  Esconde todos que possuem o viewport abaixo
+  @media only screen...
+*/
+@mixin hidden-down($size) {
+  @if $size == "xs" {
+    @each $media in $xs-media {
+      /* Se screen for xs, esconde */
+      @media only #{$media} {
+        display: none;
+        visibility: hidden;
+      }
+    }
+  }
+
+  @if $size == "sm" {
+    @each $media in $xs-media, $sm-media {
+      /* Se screen for xs, esconde */
+      @media only #{$media} {
+        display: none;
+        visibility: hidden;
+      }
+    }
+  }
+
+  @if $size == "md" {
+    @each $media in $xs-media, $sm-media, $md-media {
+      /* Se screen for xs, esconde */
+      @media only #{$media} {
+        display: none;
+        visibility: hidden;
+      }
+    }
+  }
+
+  @if $size == "lg" {
+    @each $media in $xs-media, $sm-media, $md-media, $lg-media {
+      /* Se screen for xs, esconde */
+      @media only #{$media} {
+        display: none;
+        visibility: hidden;
+      }
+    }
+  }
+}
+
+@mixin container-fluid() {
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: 2rem;
+  padding-left: 2rem;
+  
+}
+
+/**
+  Esconde todos que possuem o viewport acima
+  @media only screen...
+*/
+@mixin container-fluid-up($size) {
+  @if $size == "xs" {
+    @each $media in $xs-media, $sm-media, $md-media, $lg-media {
+      /* Se screen for xs, esconde */
+      @media only #{$media} {
+        @include container-fluid();
+      }
+    }
+  }
+
+
+  @if $size == "sm" {
+    @each $media in $sm-media, $md-media, $lg-media {
+      /* Se screen for xs, esconde */
+      @media only #{$media} {
+        @include container-fluid();
+
+      }
+    }
+  }
+
+  @if $size == "md" {
+    @each $media in $md-media, $lg-media {
+      /* Se screen for xs, esconde */
+      @media only #{$media} {
+        @include container-fluid();
+      }
+    }
+  }
+
+  @if $size == "lg" {
+    @each $media in $lg-media {
+      /* Se screen for xs, esconde */
+      @media only #{$media} {
+        @include container-fluid();
+      }
+    }
+  }
+}
+
+/**
+  Esconde todos que possuem o viewport abaixo
+  @media only screen...
+*/
+@mixin container-fluid-down($size) {
+  @if $size == "xs" {
+    @each $media in $xs-media {
+      /* Se screen for xs, esconde */
+      @media only #{$media} {
+        @include container-fluid();
+      }
+    }
+  }
+
+  @if $size == "sm" {
+    @each $media in $xs-media, $sm-media {
+      /* Se screen for xs, esconde */
+      @media only #{$media} {
+        @include container-fluid();
+      }
+    }
+  }
+
+  @if $size == "md" {
+    @each $media in $xs-media, $sm-media, $md-media {
+      /* Se screen for xs, esconde */
+      @media only #{$media} {
+        @include container-fluid();
+      }
+    }
+  }
+
+  @if $size == "lg" {
+    @each $media in $xs-media, $sm-media, $md-media, $lg-media {
+      /* Se screen for xs, esconde */
+      @media only #{$media} {
+        @include container-fluid();
+      }
+    }
+  }
+}
+
+/**
+  Mostra todos que possuem o viewport acima
+  @media only screen...
+*/
+// @mixin show-top($size) {
+//   @if $size == "xs" {
+//     @each $media in $xs-media, $sm-media, $md-media, $lg-media {
+//       /* Se screen for xs, esconde */
+//       @media not #{$media} {
+//         display: none;
+//         visibility: hidden;
+//       }
+//     }
+//   }
+
+//   @if $size == "sm" {
+//     @each $media in $sm-media, $md-media, $lg-media {
+//       /* Se screen for xs, esconde */
+//       @media not #{$media} {
+//         display: none;
+//         visibility: hidden;
+//       }
+//     }
+//   }
+
+//   @if $size == "md" {
+//     @each $media in $md-media, $lg-media {
+//       /* Se screen for xs, esconde */
+//       @media not #{$media} {
+//         display: none;
+//         visibility: hidden;
+//       }
+//     }
+//   }
+
+//   @if $size == "lg" {
+//     @each $media in $lg-media {
+//       /* Se screen for xs, esconde */
+//       @media not #{$media} {
+//         display: none;
+//         visibility: hidden;
+//       }
+//     }
+//   }
+// }
+
+/**
+  Mostra todos que possuem o viewport abaixo
+  @media only screen...
+*/
+// @mixin show-down($size) {
+//   @if $size == "xs" {
+//     @each $media in $xs-media {
+//       /* Se screen for xs, esconde */
+//       @media not #{$media} {
+//         display: none;
+//         visibility: hidden;
+//       }
+//     }
+//   }
+
+//   @if $size == "sm" {
+//     @each $media in $xs-media, $sm-media {
+//       /* Se screen for xs, esconde */
+//       @media not #{$media} {
+//         display: none;
+//         visibility: hidden;
+//       }
+//     }
+//   }
+
+//   @if $size == "md" {
+//     @each $media in $xs-media, $sm-media, $md-media {
+//       /* Se screen for xs, esconde */
+//       @media not #{$media} {
+//         display: none;
+//         visibility: hidden;
+//       }
+//     }
+//   }
+
+//   @if $size == "lg" {
+//     @each $media in $xs-media, $sm-media, $md-media, $lg-media {
+//       /* Se screen for xs, esconde */
+//       @media not #{$media} {
+//         display: none;
+//         visibility: hidden;
+//       }
+//     }
+//   }
+// }

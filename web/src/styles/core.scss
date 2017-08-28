@@ -1,0 +1,239 @@
+@import 'mixins';
+@import 'variables';
+
+body {
+  margin: 0;
+  font-size: 16px;
+  overflow-x: hidden;
+}
+
+.hidden {
+  display: none;
+  visibility: hidden;
+}
+
+/* ---------- Responsividade ---------- */
+
+.hidden {
+  &-xs {
+    @include media-only($xs-media, "hidden");
+  }
+  &-sm {
+    @include media-only($sm-media, "hidden");
+  }
+  &-md {
+    @include media-only($md-media, "hidden");
+  }
+  &-lg {
+    @include media-only($lg-media, "hidden");
+  }
+}
+
+.show {
+  &-xs {
+    @include media-not($xs-media, "hidden");
+  }
+  &-sm {
+    @include media-not($sm-media, "hidden");
+  }
+  &-md {
+    @include media-not($md-media, "hidden");
+  }
+  &-lg {
+    @include media-not($lg-media, "hidden");
+  }
+}
+
+.hidden-up {
+  &-xs {
+    @include hidden-up("xs");
+  }
+  &-sm {
+    @include hidden-up("sm");
+  }
+  &-md {
+    @include hidden-up("md");
+  }
+  &-lg {
+    @include hidden-up("lg");
+  }
+}
+
+.hidden-down {
+  &-xs {
+    @include hidden-down("xs");
+  }
+  &-sm {
+    @include hidden-down("sm");
+  }
+  &-md {
+    @include hidden-down("md");
+  }
+  &-lg {
+    @include hidden-down("lg");
+  }
+}
+
+.container-fluid-up {
+  &-xs {
+    @include container-fluid-up("xs");
+  }
+  &-sm {
+    @include container-fluid-up("sm");
+  }
+  &-md {
+    @include container-fluid-up("md");
+  }
+  &-lg {
+    @include container-fluid-up("lg");
+  }
+}
+
+.container-fluid-down {
+  &-xs {
+    @include container-fluid-down("xs");
+  }
+  &-sm {
+    @include container-fluid-down("sm");
+  }
+  &-md {
+    @include container-fluid-down("md");
+  }
+  &-lg {
+    @include container-fluid-down("lg");
+  }
+}
+
+// .show-top {
+//   &-xs {
+//     @include show-top("xs");
+//   }
+//   &-sm {
+//     @include show-top("sm");
+//   }
+//   &-md {
+//     @include show-top("md");
+//   }
+//   &-lg {
+//     @include show-top("lg");
+//   }
+// }
+
+// .show-down {
+//   &-xs {
+//     @include show-down("xs");
+//   }
+//   &-sm {
+//     @include show-down("sm");
+//   }
+//   &-md {
+//     @include show-down("md");
+//   }
+//   &-lg {
+//     @include show-down("lg");
+//   }
+// }
+
+a {
+  color: #00bcd4;
+  font-weight: bold;
+  text-decoration: none;
+  transition: color 0.4s;
+  &:hover {
+    color: #1976d2;
+  }
+}
+
+.text-center {
+  text-align: center;
+}
+
+.top-bar {
+  padding: 10px 15px;
+  margin-bottom: 50px;
+}
+.top-bar::after {
+  content: '';
+  display: block;
+  clear: both;
+}
+
+.top-bar-left {
+  float: left;
+  font-size: 1.5em;
+}
+
+.top-bar-right {
+  float: right;
+}
+
+.top-bar a,
+.nav a {
+  margin: 0 8px;
+}
+
+.card-heading {
+  padding: 16px;
+}
+
+.field-line, .button-line {
+  padding: 16px;
+}
+
+.error-message {
+  padding: 0 16px;
+  color: #f44336;
+}
+
+.success-message {
+  padding: 0 16px;
+  color: #4caf50;
+}
+
+.warning-message {
+  padding: 0 16px;
+  color: #ff9800;
+}
+
+.hr-text {
+  line-height: 1em;
+  position: relative;
+  outline: 0;
+  border: 0;
+  color: black;
+  text-align: center;
+  height: 1.5em;
+  opacity: .5;
+  &:before {
+    content: '';
+    // use the linear-gradient for the fading effect
+    // use a solid background color for a solid bar
+    background: linear-gradient(to right, transparent, #e4e4e4, transparent);
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    height: 1px;
+  }
+  &:after {
+    content: attr(data-content);
+    position: relative;
+    display: inline-block;
+    color: black;
+
+    padding: 0 .5em;
+    line-height: 1.5em;
+    // this is really the only tricky part, you need to specify the background color of the container element...
+    color: #e4e4e4;
+    background-color: #303030;
+  }
+}
+
+// Just change "red" to any color
+input:-webkit-autofill {
+  -webkit-text-fill-color: #ffebb6 !important;
+  -webkit-box-shadow: 0 0 0px 1000px #343434 inset;
+  
+  -moz-box-shadow: 0 0 0px 1000px #343434 inset;
+  box-shadow: 0 0 0px 1000px #343434 inset;
+}

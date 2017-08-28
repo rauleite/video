@@ -1,0 +1,18 @@
+{
+    "name": "video",
+    "version": "0.1.0",
+    "engines": {
+        "node": "^8.4.0",
+        "npm": "^5.3.0"
+    },
+    "scripts": {
+        "web": "sh -c 'cd ./web && export NODE_ENV=development && export PORT=3001 && exec npm run start'",
+        "server": "sh -c 'cd ./server && export NODE_ENV=development && export PORT=3000 && npm run dev'",
+        "app": "sh -c 'node ./web/node_modules/npm-run-all/bin/npm-run-all/index.js -p web server'",
+        "env": "docker-compose up",
+        "db": "docker-compose db",
+        "mem": "docker-compose mem",
+        "build-dev": "sh -c 'cd ./server && yarn install && cd ../web && yarn install'"
+
+    }
+}
