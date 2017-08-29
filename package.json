@@ -1,18 +1,27 @@
 {
-    "name": "video",
-    "version": "0.1.0",
-    "engines": {
-        "node": "^8.4.0",
-        "npm": "^5.3.0"
-    },
-    "scripts": {
-        "web": "sh -c 'cd ./web && export NODE_ENV=development && export PORT=3001 && exec npm run start'",
-        "server": "sh -c 'cd ./server && export NODE_ENV=development && export PORT=3000 && npm run dev'",
-        "app": "sh -c 'node ./web/node_modules/npm-run-all/bin/npm-run-all/index.js -p web server'",
-        "env": "docker-compose up",
-        "db": "docker-compose db",
-        "mem": "docker-compose mem",
-        "build-dev": "sh -c 'cd ./server && yarn install && cd ../web && yarn install'"
-
-    }
+  "name": "video",
+  "version": "0.1.0",
+  "license": "MIT",  
+  "engines": {
+    "node": "^8.4.0",
+    "npm": "^5.3.0"
+  },
+  "dependencies": {
+    "cross-env": "^5.0.5",
+    "npm-run-all": "^4.0.2"
+  },
+  "scripts": {
+    "db": "docker-compose db",
+    "mem": "docker-compose mem",
+    "env": "docker-compose up",
+    "web": "cd ./web && cross-env NODE_ENV=development PORT=3001 && yarn start",
+    "server": "cd ./server && export NODE_ENV=development PORT=3000 && yarn dev",
+    "app": "run-p web server",
+    "install-web": "cd ./web && yarn install",
+    "install-server": "cd ./server && yarn install",
+    "install-app": "yarn install && run-p install-web install-server",
+    "build-web": "cd ./web && yarn build",
+    "build-server": "cd ./server && yarn build",
+    "build-app": "yarn install && run-p build-server build-web"
+  }
 }

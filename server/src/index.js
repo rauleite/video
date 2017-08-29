@@ -28,7 +28,9 @@ require('./connect/server')(app)
 passport.use('local-signup', require('./strategies/local-signup'))
 passport.use('local-login', require('./strategies/local-login'))
 
-// app.use(express.static(project.paths.public()))
+/* NGINX serve em producao, mas pode descomentar pra testar o build localmente */
+// console.log('project.build_path', project.build_path)
+// app.use(express.static(project.build_path))
 
 app.disable('x-powered-by')
 

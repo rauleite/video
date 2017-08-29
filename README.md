@@ -4,21 +4,21 @@
 
 ## Ambiente Dev (Local - PRIMEIRA VEZ)
 <!-- 1. Apontar dns ***127.0.0.1 melhore-local.me*** em **/etc/hosts** -->
-1. Baixar e descompactar na raiz do projeto o diretório **config** no diretório *server* *(**config** fica em cloud separada e não no repositório do projeto)*
-    * https://github.com/rauleite/video .
-    * Baixar *config.tar.gz* em *server*
-    * `tar -zxvf config.tar.gz && rm config.tar.gz`
+<!-- Baixar e descompactar na raiz do projeto o diretório **config** no diretório *server* *(**config** fica em cloud separada e não no repositório do projeto)* -->
+1. Clonar repo do projeto
+    * `git clone https://github.com/rauleite/video`
 
 1. Usar versões de node indicado em *./package.json*.
     * Recomendo instalar via [NVM](https://github.com/creationix/nvm#installation)
-    * PS. *(Troque pela versão correta)*:  
+    * PS. *(Troque pela versão correta)*  
     `nvm install 8.4.0`  
     `nvm alias default 8.4.0`
 1. Pre requisito
     * `sudo apt-get install build-essential -y`
 1. Ao invés de usar NPM use [Yarn](https://yarnpkg.com/lang/en/docs/install)
-1. `yarn build-dev`
-1. Olhar *scripts* em *./package.json*. Use os comandos desejados. Por ex (um em cada - aba do - terminal diferente:
+1. Instalar dependências
+    * `yarn install`
+1. Olhar *scripts* em *./package.json*. Use os comandos desejados. Por ex (um em cada - aba do - terminal diferente
     * `yarn env`
     * `yarn web`
     * `yarn server`
@@ -27,24 +27,30 @@
 ## Ambiente Prod (Servidor - PRIMEIRA VEZ)
 1. Acessar EC2
     * PS. *(Troque para arquivo PEM e DNS corretos)*:  
-    `sudo ssh -i "config/aws/free.pem" ubuntu@ec2-18-220-205-21.us-east-2.compute.amazonaws.com`
+      * `sudo ssh -i "config/aws/free.pem" ubuntu@ec2-18-220-205-21.us-east-2.compute.amazonaws.com`
 1. Clonar repositório
-    * `cd ~ && mkdir -p www && git clone https://github.com/rauleite/react-redux-video.git www && cd www`
-1. Copiar **config** para remoto. Na máquina local:
-    * PS. *(Troque para path, PEM  e DNS corretos)*:  
-  `sudo scp -i config/aws/free.pem ~/Download/config.tar.gz ubuntu@ec2-18-220-205-21.us-east-2.compute.amazonaws.com:~/www/`
+    * `cd /`
+    * `sudo git clone https://github.com/rauleite/video.git`
+1. Copiar **config** para remoto. Na máquina local fazer
+    * PS. *(Troque para path, PEM  e DNS corretos)*
+        * `cd video`  
+        * `sudo scp -i server/config/aws/free.pem ~/Downloads/config.tar.gz ubuntu@ec2-18-220-205-21.us-east-2.compute.amazonaws.com:~/`
 1. Volte pra raiz do projeto **remoto**
-    * `tar -zxvf config.tar.gz && rm config.tar.gz`
-<!-- 1. Gerar *arquivos dist*:
-    * `yarn run deploy:light` -->
+    * `sudo cp ~/config.tar.gz /video/server`
+    * `cd /video/server`
+    * `sudo tar -zxvf config.tar.gz && sudo rm config.tar.gz`
+    * Se necessário: `sudo chgrp root config && sudo chown root config`
+1. Gerar arquivos *server/dist* e *web/buid*
+    * `yarn build`
 1. Instalar [docker](https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/) e [docker-compose](https://docs.docker.com/compose/install/#install-compose)
 1. Apontar dns *127.0.0.1 melhore.me* em **/etc/hosts**
 1. Subir server, mem, db, e app de uma vez:
     * `docker-compose -f docker-compose.yml -f docker-compose.prod.yml up`
 1. Acessar em melhore.me
-
+1. Remover *config.tar.gz* local e remoto.
 
 ## Ambiente Prod (Servidor - PRÓXIMAS VEZES)
+...
 
 # Comandos úteis
 ## Docker
@@ -56,9 +62,19 @@
 1. Subir cada container por vez:
     * `docker-compose db`
 1. Compactar **config**, sem *server*
-    * sudo tar -zcvf config.tar.gz config/    
+    * `sudo tar -zcvf config.tar.gz config/`    
+1. Remover coisas no Docker (cuidado): 
+    * Remover todos os containers:
+        * `docker rm -f $(docker ps -a -q)`
+    * Remover todas as imagens:
+        * `docker rmi -f $(docker images -a -q)`
+    * Remover todos os volumes:
+        * `docker volume rm $(docker volume ls -q)`
+    * Remover todos os networks:
+        * `docker network rm $(docker network ls | tail -n+2 | awk '{if($2 !~ /bridge|none|host/){ print $1 }}')`
 
 # Características do projeto:
+
 ### 2 módulos, abaixo de 1 módulo externo:
 * **Módulo externo**
     * Raiz do github.
@@ -69,6 +85,16 @@
     * Tudo que é relacionado ao back end (Nodejs, Express etc.)
 
 * Facilidade de instalação e configuração para foco no desenvolvimento e não dev-ops. Não precisa de ambiente, como base e mem-cache por ex. Scripts pra fácil utilização.
+
+## Erros conhecidos:
+
+```
+ERROR: for mem  Cannot create container for service mem: Conflict. The container name "/mem" is already in use by container "9c4dbbb09b824f34de6a33fd3d3ec3423a47c2e3fedCreating db ... error
+```
+**Causa:** Quando altera arquivo raiz do projeto e tenta subir novamente o container.
+
+**Solulção:** Limpar containers (este comando limpa todos de uma vez, mas pode remover apenas os que estão em conflito, como *mem* ou *db* por ex.)
+  * `docker rm -f $(docker ps -a -q)`
 
 ---
 

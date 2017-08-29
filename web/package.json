@@ -1,7 +1,8 @@
 {
-  "name": "video-server",
+  "name": "video-web",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "proxy": "http://localhost:3000",
   "dependencies": {
     "hellojs": "^1.15.1",
@@ -22,15 +23,13 @@
   "devDependencies": {
     "deep-freeze": "^0.0.1",
     "immutable": "^3.8.1",
-    "npm-run-all": "^4.0.2",
     "react-immutable-proptypes": "^2.1.0"
   },
   "scripts": {
     "start-js": "react-scripts start",
-    "start": "export PORT=3001 && npm-run-all -p watch-css start-js",
+    "start": "export PORT=3001 && run-p watch-css start-js",
     "build": "npm run build-css && react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject",
     "build-css": "node-sass-chokidar src/ -o src/",
     "watch-css": "npm run build-css && node-sass-chokidar src/ -o src/ --watch --recursive"
   }

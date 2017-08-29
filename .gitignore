@@ -2,12 +2,16 @@
 
 # modulo SERVER
 server/config*
+server/dist
 
 # modulo WEB
 web/src/**/*.css
 
 # todos modulos
-*/node_modules
-*/yarn.lock
+**/node_modules
 */.DS_Store
 */**/*.log
+tests.js
+
+
+# */**/yarn.lock

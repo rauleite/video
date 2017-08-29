@@ -7,7 +7,9 @@ module.exports = function connect (callback) {
   
   console.log('--------> db_uri:', db_uri)
 
-  mongoose.connect(db_uri)
+  mongoose.connect(db_uri, {
+    useMongoClient: true
+  })
 
   // plug in the promise library:
   mongoose.Promise = global.Promise
