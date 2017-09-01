@@ -1,27 +1,41 @@
 {
   "name": "video",
   "version": "0.1.0",
-  "license": "MIT",  
+  "license": "MIT",
   "engines": {
     "node": "^8.4.0",
     "npm": "^5.3.0"
   },
   "dependencies": {
     "cross-env": "^5.0.5",
-    "npm-run-all": "^4.0.2"
+    "npm-run-all": "^4.0.2",
+    "shx": "^0.2.2"
   },
   "scripts": {
+    "env": "docker-compose up",
+    "app": "run-p web server",
+    "all": "run-p env app",
+    "install-app": "yarn install && run-p install-web install-server",
+    "build-app": "run-p build-web build-server",
+    "rm-build-app": "run-p rm-build-web rm-build-server",
+    "dkcp-up": "yarn build-app && docker-compose -f docker-compose.yml -f docker-compose.prod.yml up",
+    "dkcp-up-build": "yarn build-app && docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build",
+    "dkcp-up-build-with-proxy": "yarn build-app && docker-compose -f docker-compose.prod.yml -f docker-compose.yml up --build",
+
     "db": "docker-compose db",
     "mem": "docker-compose mem",
-    "env": "docker-compose up",
+    
     "web": "cd ./web && cross-env NODE_ENV=development PORT=3001 && yarn start",
     "server": "cd ./server && export NODE_ENV=development PORT=3000 && yarn dev",
-    "app": "run-p web server",
+    "server-prod": "cd ./server && export NODE_ENV=production PORT=3000 && yarn start",
+    
     "install-web": "cd ./web && yarn install",
     "install-server": "cd ./server && yarn install",
-    "install-app": "yarn install && run-p install-web install-server",
+    
     "build-web": "cd ./web && yarn build",
     "build-server": "cd ./server && yarn build",
-    "build-app": "yarn install && run-p build-server build-web"
+
+    "rm-build-web": "shx rm -rf web/build",
+    "rm-build-server": "shx rm -rf web/build"
   }
 }

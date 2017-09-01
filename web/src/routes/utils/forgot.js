@@ -1,10 +1,9 @@
 import express from 'express'
 import crypto from 'crypto'
 import nodemailer from 'nodemailer'
-import config from '../../../config/project.config'
+// import config from '../../../config/project.config' // Trocar local do arquivo config
 import mongoose from 'mongoose'
 import Promise from 'bluebird'
-// import asyncUtils from '../../../utils/asyncUtils'
 import { emailFormValidate } from "../../../server/utils"
 
 /* Promisify some methods */
@@ -42,8 +41,8 @@ router.post('/', async (req, res, next) => {
       // port: 465,
       secureConnection: false,
       auth: {
-        user: config.email,
-        pass: config.email_pass
+        // user: config.email, // Trocar local do arquivo config
+        // pass: config.email_pass // Trocar local do arquivo config
       }
     })
     console.log('passou nodemailer criou object e retornando sucesso')
@@ -93,7 +92,7 @@ function validateForgotForm (payload) {
 
 function mailOptions (user, req, token) {
   return {
-    from: config.email,
+    // from: config.email, // Trocar local do arquivo config 
     to: user.email,
     subject: 'Melhore.me - Resete sua senha',
     text: `

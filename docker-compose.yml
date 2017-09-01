@@ -19,6 +19,33 @@ services:
     # tty: true
     container_name: mem
 
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    environment:
+      - MONGO_HOST=db
+      - REDIS_HOST=mem
+      - NODE_ENV=production
+    ports:
+      - 3000:3000
+    volumes:
+      - ./server/src:/server/src
+      - ./server/config:/server/config
+    links:
+      - db
+      - mem
+    # tty: false
+    # network_mode: "bridge"
+    labels:
+      - "videoaulas server in production mode"
+    container_name: server
+    # read_only: true
+
+    # command: "yarn install"
+
+  # https://hub.docker.com/_/nginx/
+
   # web:
   #   image: node:8.4.0-alpine
   #   working_dir: /web

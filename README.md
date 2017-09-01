@@ -2,6 +2,7 @@
 
 *PS. Sempre baseado em Ubuntu.*
 
+---
 ## Ambiente Dev (Local - PRIMEIRA VEZ)
 <!-- 1. Apontar dns ***127.0.0.1 melhore-local.me*** em **/etc/hosts** -->
 <!-- Baixar e descompactar na raiz do projeto o diretório **config** no diretório *server* *(**config** fica em cloud separada e não no repositório do projeto)* -->
@@ -22,8 +23,8 @@
     * `yarn env`
     * `yarn web`
     * `yarn server`
-    
 
+---
 ## Ambiente Prod (Servidor - PRIMEIRA VEZ)
 1. Acessar EC2
     * PS. *(Troque para arquivo PEM e DNS corretos)*:  
@@ -40,18 +41,28 @@
     * `cd /video/server`
     * `sudo tar -zxvf config.tar.gz && sudo rm config.tar.gz`
     * Se necessário: `sudo chgrp root config && sudo chown root config`
-1. Gerar arquivos *server/dist* e *web/buid*
-    * `yarn build`
+1. Gerar arquivos *server/build* e *web/buid*
+    * `yarn build-app`
 1. Instalar [docker](https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/) e [docker-compose](https://docs.docker.com/compose/install/#install-compose)
-1. Apontar dns *127.0.0.1 melhore.me* em **/etc/hosts**
 1. Subir server, mem, db, e app de uma vez:
-    * `docker-compose -f docker-compose.yml -f docker-compose.prod.yml up`
+    * `docker-compose -f docker-compose.yml -f docker-compose.prod.yml up` *(pode adicionar --build)*
 1. Acessar em melhore.me
 1. Remover *config.tar.gz* local e remoto.
+1. Em diferentes terminais:
+    * `yarn env`
+    * `yarn server-prod`
 
+---
 ## Ambiente Prod (Servidor - PRÓXIMAS VEZES)
 ...
 
+---
+## Simular Ambiente Prod em local(Servidor - PRÓXIMAS VEZES)
+1. Apontar dns *127.0.0.1 melhore-local.me* em **/etc/hosts** e testar http://melhore-local.me
+1. Substituir ENV path_root **~/dev/video** em **/root-app/server/Dockerfile.dev**, pelo seu */root-app/app-name* local 
+
+
+---
 # Comandos úteis
 ## Docker
 1. Attach à um run container ('sh' para alpine, ou /bin/bash para debian)
@@ -72,7 +83,9 @@
         * `docker volume rm $(docker volume ls -q)`
     * Remover todos os networks:
         * `docker network rm $(docker network ls | tail -n+2 | awk '{if($2 !~ /bridge|none|host/){ print $1 }}')`
-
+1. Criar rede compartilhada:
+    * `docker network create -d bridge --subnet 192.168.0.0/24 --gateway 192.168.0.1 proxynet`
+    
 # Características do projeto:
 
 ### 2 módulos, abaixo de 1 módulo externo:
