@@ -16,8 +16,8 @@ module.exports = function (app) {
   const log = require('debug')
   const debug = log('app:bin:dev-server')
   
-  console.log('----------> process.env.MONGO_HOST:', process.env.MONGO_HOST)
-  console.log('----------> process.env.REDIS_HOST:', process.env.REDIS_HOST)
+  console.log('----------> project.mongo_host:', project.mongo_host)
+  console.log('----------> project.redis_host:', project.redis_host)
   
   // const options = {
   //   cert: fs.readFileSync(project.ssl_cert),

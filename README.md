@@ -1,9 +1,26 @@
+# Características técnicas da aplicação
+* Seguro contra DDOS
+* Seguro com CORS
+* Headers seguros
+* Validação em front e server side 
+* Proxy reverso e cache de arquivos estáticos
+* Desenvolvimento ágil, (livereload etc)
+* Ambiente virtualizado configurado
+* Fácil implantação e deploy
+* Bem documentado
+
+
 # Configurações necessárias
 
 *PS. Sempre baseado em Ubuntu.*
 
 ---
-## Ambiente Dev (Local - PRIMEIRA VEZ)
+## Ambiente Dev
+
+### Características
+Ambiente como persistência em ram e banco de dados, será entregue pronto (virtualizado). O app (/server e /web), deverá ser instalado e rodado na máquina, conforme instruções.
+
+Todos os comandos aqui descritos, consideram que você está no projeto raiz (um nível antes dos apps *server* e *web*).
 <!-- 1. Apontar dns ***127.0.0.1 melhore-local.me*** em **/etc/hosts** -->
 <!-- Baixar e descompactar na raiz do projeto o diretório **config** no diretório *server* *(**config** fica em cloud separada e não no repositório do projeto)* -->
 1. Clonar repo do projeto
@@ -17,12 +34,26 @@
 1. Pre requisito
     * `sudo apt-get install build-essential -y`
 1. Ao invés de usar NPM use [Yarn](https://yarnpkg.com/lang/en/docs/install)
-1. Instalar dependências
-    * `yarn install`
-1. Olhar *scripts* em *./package.json*. Use os comandos desejados. Por ex (um em cada - aba do - terminal diferente
-    * `yarn env`
-    * `yarn web`
-    * `yarn server`
+1. Instale na primeira vez:
+    * `yarn install:app`
+1. Sempre que precisar rodar o app (cada comando em terminais diferente):
+    * Opção 1 (Recomendado)
+      * `yarn env`
+      * `yarn app`
+    * Opção 2
+      * `yarn env`
+      * `yarn weeb`
+      * `yarn server`
+    * Opção 3
+      * `yarn db`
+      * `yarn mem`
+      * `yarn web`
+      * `yarn server`
+    * Opção 4
+      * `yarn all`
+
+1. Abrirá: *localhost:3001*.
+1. Olhar *scripts* em *./package.json*, para mais comandos úties.
 
 ---
 ## Ambiente Prod (Servidor - PRIMEIRA VEZ)
@@ -58,9 +89,21 @@
 
 ---
 ## Simular Ambiente Prod em local(Servidor - PRÓXIMAS VEZES)
+Teste o ambiente de produção na sua máquina. Neste caso, não será utilizado nenhuma dependência da sua máquina, mas sim será montado todo o container virtual que rodará em produção, na sua máquina). Porém os sguintes arquivos são compartilhados: *./web/config/proxy/nginx.conf* e *./web/config/proxy/default* 
 1. Apontar dns *127.0.0.1 melhore-local.me* em **/etc/hosts** e testar http://melhore-local.me
-1. Substituir ENV path_root **~/dev/video** em **/root-app/server/Dockerfile.dev**, pelo seu */root-app/app-name* local 
+1. Run
+    * `yarn proxy`
+1. Será criado (ou substituído) o diretório **build** em *web* que pode ser excluído a qualquer momento, caso queira.
+    * Exclua diretamente, ou `rm:build:web`
 
+### Dicas
+  * Arquivos para mudar configurações do Nginx:
+    * *./web/config/proxy/nginx.conf*
+    * *./web/config/proxy/default*
+  * Para acessar o container proxy
+    * `docker exec -it proxy sh`
+  * Para reiniciar Nginx, de dentro do container
+    * `nginx -s reload`
 
 ---
 # Comandos úteis

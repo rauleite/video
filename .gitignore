@@ -12,6 +12,7 @@ web/src/**/*.css
 */.DS_Store
 */**/*.log
 tests.js
+**/.yarnclean
 
 
 # */**/yarn.lock

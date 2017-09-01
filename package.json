@@ -12,30 +12,27 @@
     "shx": "^0.2.2"
   },
   "scripts": {
-    "env": "docker-compose up",
+    "install:app": "yarn install && run-p install:web install:server",
+    "env": "docker-compose -f dkcp-env.yml up",
     "app": "run-p web server",
     "all": "run-p env app",
-    "install-app": "yarn install && run-p install-web install-server",
-    "build-app": "run-p build-web build-server",
-    "rm-build-app": "run-p rm-build-web rm-build-server",
-    "dkcp-up": "yarn build-app && docker-compose -f docker-compose.yml -f docker-compose.prod.yml up",
-    "dkcp-up-build": "yarn build-app && docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build",
-    "dkcp-up-build-with-proxy": "yarn build-app && docker-compose -f docker-compose.prod.yml -f docker-compose.yml up --build",
 
-    "db": "docker-compose db",
-    "mem": "docker-compose mem",
+    "proxy": "yarn build:web && yarn proxy:light -- --build",
+    "proxy:light": "docker-compose -f dkcp-env.yml -f dkcp-proxy.yml -f dkcp-server.yml up",
     
+    "build:app": "run-p build:web build:server",
+    "clean:app": "run-p clean:web clean:server",
+
     "web": "cd ./web && cross-env NODE_ENV=development PORT=3001 && yarn start",
     "server": "cd ./server && export NODE_ENV=development PORT=3000 && yarn dev",
-    "server-prod": "cd ./server && export NODE_ENV=production PORT=3000 && yarn start",
     
-    "install-web": "cd ./web && yarn install",
-    "install-server": "cd ./server && yarn install",
+    "install:web": "cd ./web && yarn install",
+    "install:server": "cd ./server && yarn install",
     
-    "build-web": "cd ./web && yarn build",
-    "build-server": "cd ./server && yarn build",
+    "build:web": "cd ./web && yarn build",
+    "build:server": "cd ./server && yarn build",
 
-    "rm-build-web": "shx rm -rf web/build",
-    "rm-build-server": "shx rm -rf web/build"
+    "clean:web": "shx rm -rf web/build",
+    "clean:server": "shx rm -rf server/build"
   }
 }
