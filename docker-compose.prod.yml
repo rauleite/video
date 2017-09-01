@@ -1,0 +1,48 @@
+version: "3.2"
+services:
+  # # https://hub.docker.com/_/node/
+  server:
+    build:
+      context: ./server
+    environment:
+      - MONGO_HOST=db
+      - REDIS_HOST=mem
+      - NODE_ENV=production
+    ports:
+      - 3000:3000
+    links:
+      - db
+      - mem
+    # tty: false
+    # network_mode: "bridge"
+    
+    labels:
+    - "videoaulas server in production mode"
+    container_name: server
+    
+  # https://hub.docker.com/_/nginx/
+  proxy:
+    build:
+      context: ./web
+
+    restart: always
+    # networks:
+    #   - proxylocal
+    ports:
+      - 80:80
+      - 443:443
+    # environment:
+      # - NGINX_HOST=server
+      # - VIRTUAL_HOST=server
+
+    # network_mode: "bridge"
+    # read_only: false
+    
+    links:
+      - server
+    # tty: true
+    container_name: proxy
+
+# networks:
+#   proxylocal:
+#     external: true

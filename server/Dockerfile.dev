@@ -1,0 +1,27 @@
+FROM node:8.4.0-alpine
+
+MAINTAINER rauleite
+
+# ATENCAO #
+# Substituir somente o root_app_path
+
+ENV root_app_path /home/raul/dev/video
+
+ENV app_name /server
+ENV container_path ${app_name}
+
+WORKDIR $container_path
+
+COPY package.json $container_path
+
+# RUN mkdir /server/src 
+
+VOLUME ["/server/src", "/server/config"]
+# VOLUME /home/raul/dev/video/server/src /server/src 
+# /server/src
+
+
+# RUN cd ${container_path} && yarn install
+RUN yarn install
+ENTRYPOINT yarn dev
+# ENTRYPOINT ls /server/src
