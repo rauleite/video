@@ -1,23 +1,22 @@
-# Características técnicas da aplicação
-* Seguro contra DDOS
-* Seguro com CORS
-* Headers seguros
-* Validação em front e server side 
-* Proxy reverso e cache de arquivos estáticos
-* Desenvolvimento ágil, (livereload etc)
-* Ambiente virtualizado configurado
-* Fácil implantação e deploy
-* Bem documentado
+## Características técnicas da aplicação
+  * Front seguro: CORS, Headers, Todas medidas de Proxy e Static Files etc
+  * Back seguro:  Firewall, DDOS, Monitoramento de OS e Network, validações etc 
+  * Proxy reverso e cache de arquivos estáticos
+  * Desenvolvimento ágil, (livereload etc)
+  * Ambiente virtualizado configurado
+  * Fácil implantação e deploy
+  * Scripts pré configurados
+  * Scripts cross platform
+  * Bem documentado
 
-
-# Configurações necessárias
+## Configurações necessárias
 
 *PS. Sempre baseado em Ubuntu.*
 
 ---
-## Ambiente Dev
+### Ambiente Dev
 
-### Características
+#### Características
 Ambiente como persistência em ram e banco de dados, será entregue pronto (virtualizado). O app (/server e /web), deverá ser instalado e rodado na máquina, conforme instruções.
 
 Todos os comandos aqui descritos, consideram que você está no projeto raiz (um nível antes dos apps *server* e *web*).
@@ -56,39 +55,35 @@ Todos os comandos aqui descritos, consideram que você está no projeto raiz (um
 1. Olhar *scripts* em *./package.json*, para mais comandos úties.
 
 ---
-## Ambiente Prod (Servidor - PRIMEIRA VEZ)
+### Ambiente Prod (Servidor - PRIMEIRA VEZ)
 1. Acessar EC2
     * PS. *(Troque para arquivo PEM e DNS corretos)*:  
-      * `sudo ssh -i "config/aws/free.pem" ubuntu@ec2-18-220-205-21.us-east-2.compute.amazonaws.com`
+      * `sudo ssh -i "./server/config/aws/free.pem" ubuntu@ec2-18-220-205-21.us-east-2.compute.amazonaws.com`
+      * Ou script em *./server/config/tools*
 1. Clonar repositório
-    * `cd /`
-    * `sudo git clone https://github.com/rauleite/video.git`
+    * `cd ~`
+    * `git clone https://github.com/rauleite/video.git`
 1. Copiar **config** para remoto. Na máquina local fazer
     * PS. *(Troque para path, PEM  e DNS corretos)*
-        * `cd video`  
-        * `sudo scp -i server/config/aws/free.pem ~/Downloads/config.tar.gz ubuntu@ec2-18-220-205-21.us-east-2.compute.amazonaws.com:~/`
+        * `sudo scp -i server/config/aws/free.pem ./config.tar.gz ubuntu@ec2-18-220-205-21.us-east-2.compute.amazonaws.com:~/video`
 1. Volte pra raiz do projeto **remoto**
-    * `sudo cp ~/config.tar.gz /video/server`
-    * `cd /video/server`
-    * `sudo tar -zxvf config.tar.gz && sudo rm config.tar.gz`
+    * `cd /video`
+    * `sudo tar -zxvf config.tar.gz`
     * Se necessário: `sudo chgrp root config && sudo chown root config`
-1. Gerar arquivos *server/build* e *web/buid*
-    * `yarn build-app`
 1. Instalar [docker](https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/) e [docker-compose](https://docs.docker.com/compose/install/#install-compose)
-1. Subir server, mem, db, e app de uma vez:
-    * `docker-compose -f docker-compose.yml -f docker-compose.prod.yml up` *(pode adicionar --build)*
+1. Gerar arquivos *server/build* e *web/buid*
+    * `yarn install && yarn install:web && yarn build:server`
 1. Acessar em melhore.me
 1. Remover *config.tar.gz* local e remoto.
 1. Em diferentes terminais:
-    * `yarn env`
-    * `yarn server-prod`
+    * `yarn proxy`
 
 ---
-## Ambiente Prod (Servidor - PRÓXIMAS VEZES)
+### Ambiente Prod (Servidor - PRÓXIMAS VEZES)
 ...
 
 ---
-## Simular Ambiente Prod em local(Servidor - PRÓXIMAS VEZES)
+### Simular Ambiente Prod em local(Servidor - PRÓXIMAS VEZES)
 Teste o ambiente de produção na sua máquina. Neste caso, não será utilizado nenhuma dependência da sua máquina, mas sim será montado todo o container virtual que rodará em produção, na sua máquina). Porém os sguintes arquivos são compartilhados: *./web/config/proxy/nginx.conf* e *./web/config/proxy/default* 
 1. Apontar dns *127.0.0.1 melhore-local.me* em **/etc/hosts** e testar http://melhore-local.me
 1. Run
@@ -96,7 +91,7 @@ Teste o ambiente de produção na sua máquina. Neste caso, não será utilizado
 1. Será criado (ou substituído) o diretório **build** em *web* que pode ser excluído a qualquer momento, caso queira.
     * Exclua diretamente, ou `rm:build:web`
 
-### Dicas
+#### Dicas
   * Arquivos para mudar configurações do Nginx:
     * *./web/config/proxy/nginx.conf*
     * *./web/config/proxy/default*
@@ -106,8 +101,8 @@ Teste o ambiente de produção na sua máquina. Neste caso, não será utilizado
     * `nginx -s reload`
 
 ---
-# Comandos úteis
-## Docker
+## Comandos úteis
+
 1. Attach à um run container ('sh' para alpine, ou /bin/bash para debian)
     * `docker exec -it app sh`
 1. Run terminal (override entrypoint - 'sh' para alpine, ou /bin/bash para debian)
@@ -115,8 +110,8 @@ Teste o ambiente de produção na sua máquina. Neste caso, não será utilizado
 1. `docker-compose restart web`
 1. Subir cada container por vez:
     * `docker-compose db`
-1. Compactar **config**, sem *server*
-    * `sudo tar -zcvf config.tar.gz config/`    
+1. Compactar **config**, de *./server* e *./web*
+    * `sudo tar -zcvf config.tar.gz server/config/ web/config/`
 1. Remover coisas no Docker (cuidado): 
     * Remover todos os containers:
         * `docker rm -f $(docker ps -a -q)`
@@ -128,8 +123,22 @@ Teste o ambiente de produção na sua máquina. Neste caso, não será utilizado
         * `docker network rm $(docker network ls | tail -n+2 | awk '{if($2 !~ /bridge|none|host/){ print $1 }}')`
 1. Criar rede compartilhada:
     * `docker network create -d bridge --subnet 192.168.0.0/24 --gateway 192.168.0.1 proxynet`
-    
-# Características do projeto:
+<!-- 1. "Fechar porta 21"
+    * `sudo ufw deny 21` -->
+1. Instalar [Lynis](https://www.digitalocean.com/community/tutorials/how-to-perform-security-audits-with-lynis-on-ubuntu-16-04) para auditar máquina remota.   
+1. Test Vulnerabilidades Web ([wapiti](https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-on-ubuntu-14-04))
+    *  wapiti https://18.220.205.21 -n 20 -b folder
+
+1. Ver Docker Sec: **(docker-bench-security)[https://github.com/docker/docker-bench-security]**
+
+## Scripts Bash
+* SSH
+    * *./server/config/tools/ec2-video.sh*
+    * Se necessário alterar *host="/home/raul/dev/video"*
+    * Rodar no terminal: `ec2-video.sh <13.59.195.165>`
+    * Obs. Tem que ter IP fixo e pedir pro administrador (Raul) fazer a NAT, no Group do EC2.
+
+## Características do projeto:
 
 ### 2 módulos, abaixo de 1 módulo externo:
 * **Módulo externo**
@@ -142,7 +151,7 @@ Teste o ambiente de produção na sua máquina. Neste caso, não será utilizado
 
 * Facilidade de instalação e configuração para foco no desenvolvimento e não dev-ops. Não precisa de ambiente, como base e mem-cache por ex. Scripts pra fácil utilização.
 
-## Erros conhecidos:
+### Possíveis erros conhecidos:
 
 ```
 ERROR: for mem  Cannot create container for service mem: Conflict. The container name "/mem" is already in use by container "9c4dbbb09b824f34de6a33fd3d3ec3423a47c2e3fedCreating db ... error
@@ -150,8 +159,17 @@ ERROR: for mem  Cannot create container for service mem: Conflict. The container
 **Causa:** Quando altera arquivo raiz do projeto e tenta subir novamente o container.
 
 **Solulção:** Limpar containers (este comando limpa todos de uma vez, mas pode remover apenas os que estão em conflito, como *mem* ou *db* por ex.)
-  * `docker rm -f $(docker ps -a -q)`
+  * Apagar o container em questão
+    * `docker rm <mem>`
+    * `docker rm -f $(docker ps -a -q)`
 
+```
+ERROR: for mem  Cannot create container for service mem: Conflict. The container name "/mem" is already in use by container "ee6c6c6035b9022ff46c97546788930eedb915623fd
+```
+**Causa:** Algum container antigo está em desuso, mas não foi apagado
+**Solução:** 
+    * Apagar todos os containers (Cuidado)
+    * `docker rm -f $(docker ps -a -q)`
 ---
 
 ## [Create React App](https://github.com/facebookincubator/create-react-app).

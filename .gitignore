@@ -9,6 +9,7 @@ web/src/**/*.css
 **/node_modules
 **/build
 */config
+**/config.tar.gz
 */.DS_Store
 */**/*.log
 tests.js

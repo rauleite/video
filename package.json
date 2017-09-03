@@ -17,7 +17,7 @@
     "app": "run-p web server",
     "all": "run-p env app",
 
-    "proxy": "yarn build:web && yarn proxy:light -- --build",
+    "proxy": "cross-env NODE_ENV=production && yarn build:web && yarn proxy:light -- --build",
     "proxy:light": "docker-compose -f dkcp-env.yml -f dkcp-proxy.yml -f dkcp-server.yml up",
     
     "build:app": "run-p build:web build:server",
