@@ -1,0 +1,18 @@
+FROM node:8.4.0-alpine
+
+MAINTAINER rauleite
+
+ENV path /server
+
+COPY config ${path}/config
+COPY package.json $path
+
+VOLUME ["/server/src"]
+
+RUN cd ${path} && yarn install
+# RUN rm -r ${path}/src
+
+WORKDIR $path
+
+
+ENTRYPOINT cd $path && yarn dev

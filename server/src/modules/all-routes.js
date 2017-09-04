@@ -9,15 +9,19 @@ import dashboard from './api/dashboard'
 
 import authCheck from '../middleware/auth-check'
 
+// const BASE_API = '/api'
+const BASE_API = ''
+const BASE_AUTH = `${BASE_API}/auth`
+
 module.exports = (app) => {
   /* All api path, should be authenticaded */
   app.use('/api', authCheck, dashboard)
 
-  app.use('/auth/login', login)
-  app.use('/auth/signup', signup)
-  app.use('/auth/forgot', forgot)
-  app.use('/auth/reset', reset)
-  app.use('/auth/logout', logout)
-  app.use('/auth/social', social)
+  app.use(`${BASE_AUTH}/login`, login)
+  app.use(`${BASE_AUTH}/signup`, signup)
+  app.use(`${BASE_AUTH}/forgot`, forgot)
+  app.use(`${BASE_AUTH}/auth/reset`, reset)
+  app.use(`${BASE_AUTH}/auth/logout`, logout)
+  app.use(`${BASE_AUTH}/auth/social`, social)
   // app.use('/misc/redirect', redirect)
 }

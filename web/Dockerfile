@@ -4,7 +4,7 @@ MAINTAINER rauleite
 
 ENV path /web
 
-RUN apt install nginx-extras
+# RUN apt install nginx-extras
 COPY build ${path}
 COPY public ${path}/public
 COPY config/proxy/ssl /var/ssl

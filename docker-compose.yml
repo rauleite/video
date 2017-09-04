@@ -18,3 +18,4 @@ services:
      - 6379:6379
     # tty: true
     container_name: mem
+    

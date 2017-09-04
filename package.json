@@ -13,16 +13,18 @@
   },
   "scripts": {
     "install:app": "yarn install && run-p install:web install:server",
-    "env": "docker-compose -f dkcp-env.yml up",
+    "env": "docker-compose up",
     "app": "run-p web server",
     "all": "run-p env app",
 
-    "proxy": "cross-env NODE_ENV=production && yarn build:web && yarn proxy:light -- --build",
-    "proxy:light": "docker-compose -f dkcp-env.yml -f dkcp-proxy.yml -f dkcp-server.yml up",
-    
-    "build:app": "run-p build:web build:server",
-    "clean:app": "run-p clean:web clean:server",
+    "up:prod:build": "cross-env NODE_ENV=production && yarn build:web && yarn up:prod -- --build",
+    "up:prod": "docker-compose -f dkcp-prod.yml up",
 
+    "up:local:proxy:build": "cross-env NODE_ENV=development && yarn build:web && yarn up:local:proxy -- --build",
+    "up:local:proxy": "docker-compose -f dkcp-local-proxy.yml up",
+    
+    "clean:app": "run-p clean:web clean:server",
+    
     "web": "cd ./web && cross-env NODE_ENV=development PORT=3001 && yarn start",
     "server": "cd ./server && export NODE_ENV=development PORT=3000 && yarn dev",
     
@@ -31,7 +33,8 @@
     
     "build:web": "cd ./web && yarn build",
     "build:server": "cd ./server && yarn build",
-
+    "build:app": "run-p build:web build:server",
+    
     "clean:web": "shx rm -rf web/build",
     "clean:server": "shx rm -rf server/build"
   }

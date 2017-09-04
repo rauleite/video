@@ -12,6 +12,7 @@ const opt = {
  * @param {function} callback Retorno do xhr
  */
 export async function sendData (path, options, callback) {
+  // path = `api${path}`
   options.headers = (options && options.headers) || opt.headers
   options.method = (options && options.method) || opt.method
   if (options && options.body) {

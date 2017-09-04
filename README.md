@@ -75,8 +75,8 @@ Todos os comandos aqui descritos, consideram que você está no projeto raiz (um
     * `yarn install && yarn install:web && yarn build:server`
 1. Acessar em melhore.me
 1. Remover *config.tar.gz* local e remoto.
-1. Em diferentes terminais:
-    * `yarn proxy`
+1. Run:
+    * `yarn prod`
 
 ---
 ### Ambiente Prod (Servidor - PRÓXIMAS VEZES)
@@ -87,7 +87,8 @@ Todos os comandos aqui descritos, consideram que você está no projeto raiz (um
 Teste o ambiente de produção na sua máquina. Neste caso, não será utilizado nenhuma dependência da sua máquina, mas sim será montado todo o container virtual que rodará em produção, na sua máquina). Porém os sguintes arquivos são compartilhados: *./web/config/proxy/nginx.conf* e *./web/config/proxy/default* 
 1. Apontar dns *127.0.0.1 melhore-local.me* em **/etc/hosts** e testar http://melhore-local.me
 1. Run
-    * `yarn proxy`
+    * `yarn prod`
+    * `yarn prod:light` (sem builds de deploy e nem --build do container)
 1. Será criado (ou substituído) o diretório **build** em *web* que pode ser excluído a qualquer momento, caso queira.
     * Exclua diretamente, ou `rm:build:web`
 
@@ -102,17 +103,24 @@ Teste o ambiente de produção na sua máquina. Neste caso, não será utilizado
 
 ---
 ## Comandos úteis
+* Ao testar Nginx, localmente:
+    * Se mudar ./web
+        * `yarn build:web && yarn up:local:proxy`
+    * Se alterar algo em *defaul* ou *nginx.conf*
+        * `docker exec -it proxy sh`
+        * `nginx -s reload`
+    * Se alterar algo em ./server, não precisa fazer nada.
 
-1. Attach à um run container ('sh' para alpine, ou /bin/bash para debian)
+* Attach à um run container ('sh' para alpine, ou /bin/bash para debian)
     * `docker exec -it app sh`
-1. Run terminal (override entrypoint - 'sh' para alpine, ou /bin/bash para debian)
+* Run terminal (override entrypoint - 'sh' para alpine, ou /bin/bash para debian)
     * `docker run -it --entrypoint sh <image>`
-1. `docker-compose restart web`
-1. Subir cada container por vez:
+* `docker-compose restart web`
+* Subir cada container por vez:
     * `docker-compose db`
-1. Compactar **config**, de *./server* e *./web*
+* Compactar **config**, de *./server* e *./web*
     * `sudo tar -zcvf config.tar.gz server/config/ web/config/`
-1. Remover coisas no Docker (cuidado): 
+* Remover coisas no Docker (cuidado): 
     * Remover todos os containers:
         * `docker rm -f $(docker ps -a -q)`
     * Remover todas as imagens:
@@ -121,22 +129,33 @@ Teste o ambiente de produção na sua máquina. Neste caso, não será utilizado
         * `docker volume rm $(docker volume ls -q)`
     * Remover todos os networks:
         * `docker network rm $(docker network ls | tail -n+2 | awk '{if($2 !~ /bridge|none|host/){ print $1 }}')`
-1. Criar rede compartilhada:
+
+### Procedimentos máquina remota (EC2)
+* Criar rede compartilhada:
     * `docker network create -d bridge --subnet 192.168.0.0/24 --gateway 192.168.0.1 proxynet`
 <!-- 1. "Fechar porta 21"
     * `sudo ufw deny 21` -->
-1. Instalar [Lynis](https://www.digitalocean.com/community/tutorials/how-to-perform-security-audits-with-lynis-on-ubuntu-16-04) para auditar máquina remota.   
-1. Test Vulnerabilidades Web ([wapiti](https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-on-ubuntu-14-04))
-    *  wapiti https://18.220.205.21 -n 20 -b folder
+* Instalar [Lynis](https://www.digitalocean.com/community/tutorials/how-to-perform-security-audits-with-lynis-on-ubuntu-16-04) para auditar máquina remota.   
+* Test Vulnerabilidades Web ([wapiti](https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-on-ubuntu-14-04))
+    *  `wapiti https://18.220.205.21 -n 20 -b folder`
 
-1. Ver Docker Sec: **(docker-bench-security)[https://github.com/docker/docker-bench-security]**
+* Ver Docker Sec
+    * [docker-bench-security](https://github.com/docker/docker-bench-security)
+* Logar conexões SSH
+    * `iptables -I INPUT -p tcp -m tcp --dport 22 -m state --state NEW -j LOG --log-level 1 --log-prefix "New Connection "`
+    * log registrado em: */var/log/kern.log* e */var/log/syslog*
+* Considerar instalar [Webmin](http://www.webmin.com/deb.html). Contra: ter que liberar mais uma porta de acesso do servidor remoto.
+* Instalar [Fail2Ban](https://www.digitalocean.com/community/tutorials/how-to-protect-ssh-with-fail2ban-on-ubuntu-14-04), pra monitorar tentativas de conexão SSH.
+    * Obs. Se houver 5 falhas de conexão SSH em 10 minutos, o IP será banido.
+    * [Exemplo jail.file](https://github.com/adamvlasak/work-machine/blob/fcb27c102299d178108b0e8ada6230b116b79f67/templates/jail.local)
+* Analisar estas [ferramentas de segurança](https://www.thefanclub.co.za/how-to/how-secure-ubuntu-1604-lts-server-part-1-basics)
 
 ## Scripts Bash
 * SSH
     * *./server/config/tools/ec2-video.sh*
     * Se necessário alterar *host="/home/raul/dev/video"*
     * Rodar no terminal: `ec2-video.sh <13.59.195.165>`
-    * Obs. Tem que ter IP fixo e pedir pro administrador (Raul) fazer a NAT, no Group do EC2.
+    * Obs. Tem que ter IP fixo e pedir pro administrador (Raul) fazer a NAT, no Sec. Groups do EC2.
 
 ## Características do projeto:
 
@@ -156,20 +175,14 @@ Teste o ambiente de produção na sua máquina. Neste caso, não será utilizado
 ```
 ERROR: for mem  Cannot create container for service mem: Conflict. The container name "/mem" is already in use by container "9c4dbbb09b824f34de6a33fd3d3ec3423a47c2e3fedCreating db ... error
 ```
-**Causa:** Quando altera arquivo raiz do projeto e tenta subir novamente o container.
+**Causa:** Quando altera arquivo raiz do projeto e tenta subir novamente o container. Ou algum container antigo está em desuso, mas não foi apagado
 
 **Solulção:** Limpar containers (este comando limpa todos de uma vez, mas pode remover apenas os que estão em conflito, como *mem* ou *db* por ex.)
-  * Apagar o container em questão
+  * A) Apagar o container em questão
     * `docker rm <mem>`
+  * B) Ou apagar todos os containers (Cuidado)
     * `docker rm -f $(docker ps -a -q)`
 
-```
-ERROR: for mem  Cannot create container for service mem: Conflict. The container name "/mem" is already in use by container "ee6c6c6035b9022ff46c97546788930eedb915623fd
-```
-**Causa:** Algum container antigo está em desuso, mas não foi apagado
-**Solução:** 
-    * Apagar todos os containers (Cuidado)
-    * `docker rm -f $(docker ps -a -q)`
 ---
 
 ## [Create React App](https://github.com/facebookincubator/create-react-app).

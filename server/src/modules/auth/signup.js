@@ -11,6 +11,7 @@ import {
 const router = new express.Router()
 
 router.post('/', (req, res, next) => {
+  console.log('----->', req.headers)
   if (!hasCorrectSignupBody(req.body)) {
       console.error('ERRO GRAVE: request body enviado errado')
       return res.status(400).json({
