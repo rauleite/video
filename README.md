@@ -1,13 +1,31 @@
 ## Características técnicas da aplicação
-  * Front seguro: CORS, Headers, Todas medidas de Proxy e Static Files etc
-  * Back seguro:  Firewall, DDOS, Monitoramento de OS e Network, validações etc 
-  * Proxy reverso e cache de arquivos estáticos
-  * Desenvolvimento ágil, (livereload etc)
-  * Ambiente virtualizado configurado
-  * Fácil implantação e deploy
-  * Scripts pré configurados
-  * Scripts cross platform
-  * Bem documentado
+* **Back seguro**
+  * Firewall
+  * DDOS
+  * Monitoramento OS e Network
+  * Restrição acesso aos arquivos
+* **Aplicação**
+  * *Segurança*
+    * CORS
+    * DDOS
+    * Captcha
+    * Headers
+    * Validações
+    * SSH IP Específico, knocking
+  * *Performance*
+    * DDOS
+    * Proxy Reverso
+    * Cache
+    * Informações não críticas em memória
+    * Camada servindo Static Files
+* **DevOps**
+  * *Desenvolvimento ágil*
+    * Em containers
+    * Livereload
+    * Deploy e implantação instantânea
+    * Npm Scripts pré configurados
+    * Scripts cross platform
+  * *Bem documentado*
 
 ## Configurações necessárias
 
@@ -56,19 +74,96 @@ Todos os comandos aqui descritos, consideram que você está no projeto raiz (um
 
 ---
 ### Ambiente Prod (Servidor - PRIMEIRA VEZ)
+* AWS Sec Group com ssh especificado (atualmente).
+* *Knockd* para eventual possivilidade de liberar a regra ssh de qualquer fonte em Sec Group.
+1. Acessar primeira vez (comando ssh regular):
+    * `sudo ssh -i "./server/config/aws/free.pem" ubuntu@<18.220.205.21>`
+1. Fazer snapshot do ebs de home e user
+1. Montar separadamente
+    * Drivers:
+      1. xvda: /root 9, /var 3, /tmp 2 
+      1. xvdb: /home 8 (volume enctypted)
+      1. xvdc: /usr 8 (mount ro)
+    1. Criar nova instância (second)
+    1. Atached o volume root (primary), na segundária com ela ligada
+    1. Instalar Gui no Secondary para particionar o root em 3 [Gparted](https://techloverhd.com/2015/05/install-lxde-vnc-gui-on-ubuntu-debian-server/)
+        * Tomar cuidado pra não alterar o LABEL da raiz (/)
+        * Por LABEL no resto (ex. home, usr, var, tmp)  
+    1. Depois de drivers montado, copiar. Ex
+        * Formatar dev único do /home e /usr (CUIDADO: dev do root não pode)
+          * `mkfs -t ext4 /dev/xvdg` (home)
+          * `mkfs -t ext4 /dev/xvdh` (usr)
+        * Copiar
+          * `sudo rsync -avh --progress /mnt/root/tmp /mnt/tmp/`
+          * `sudo rsync -avh --progress /mnt/root/var /mnt/var/`
+          * `sudo rsync -avh --progress /mnt/root/home /mnt/home/`
+          * `sudo rsync -avh --progress /mnt/root/usr /mnt/usr/`
+    1. Desligar Second, detached tudo (exceto root dela mesma)
+    1. Atach root na Primary com nome **sda1**, ligar e atach o resto (home e usr). 
+    1. Conferir LABLES. Se der algo errado com LABEL, fazer com UUID.
+      * `sudo file -s /dev/xvda1`
+      * `sudo file -s /dev/xvda2`
+      * etc
+    1. Fazer as alterações em /etc/fstab. Seguir sequência
+        ```
+        # Respeitar a raiz que já existe:
+        # LABEL= /    ext4 defaults 0 0`
+        LABEL=home  /home ext4 defaults 0 1
+        LABEL=tmp   /tmp  ext4 defaults 0 1
+        LABEL=usr   /usr  ext4 ro       0 1
+        LABEL=var   /var  ext4 defaults 0 1
+        ```
+    1. Renomear originais
+        * `sudo mv home home_BACK`
+        * `sudo mv tmp tmp_BACK`
+        * `sudo mv usr usr_BACK`
+        * `sudo mv var var_BACK`
+    * [/home](https://help.ubuntu.com/community/Partitioning/Home/Moving)
+      * Fazer sem a versão encryptada (o drive já é)
+      * ext4 em fstab
+      * `sudo fdisk -l`
+      * `sudo mkfs -t ext4 /dev/xvdb`  
+      * `sudo file -s /dev/xvdb`  
+      * UUID: `sudo file -s /dev/xvdb`
+      * Confirmar root: `sudo file -s /dev/xvda1` (`fdisk -l`, pode ajudar)
+      * `sudo mkdir -p /media/ubuntu/linux-root/ && sudo mkdir -p /media/ubuntu/linux-home/`
+      * `sudo mount /dev/xvda1 /media/ubuntu/linux-root/`
+      * `sudo rsync -aXS /media/ubuntu/linux-root/home/. /media/ubuntu/linux-home/.`
+
+      * Troubleshooting: Lembrar de mount root
+        * `mkdir </media/.../linux-root>`
+        * `mount /etc/<xvda1> /</media/.../linux-root>`
+        * `mkdir <command dest>`
+    * [/var](https://gist.github.com/qiaolun/4152330)
+      * *./server/config/aws/mount_var.sh*
+1. [knockd](https://www.digitalocean.com/community/tutorials/how-to-use-port-knocking-to-hide-your-ssh-daemon-from-attackers-on-ubuntu) para não precisar ter IP local fixo
+    * Troubleshouting
+      * `sudo apt install netfilter-persistent`
+      * `sudo service netfilter-persistent start`
+      * `sudo apt install knockd` (remoto e local)
+    * Não *Deny* tudo, como no tutorial, o Sec Group do EC2 já faz isto, fazer:
+      * Instruções: *./server/aws/iptb_rules.v4.v6*
+    * Basear conf em ./server/aws/default_knockd
+      * `sudo netfilter-persistent save` 
+1. [Criar novo usuário, com acesso ssh e apagar o default](https://aws.amazon.com/pt/premiumsupport/knowledge-center/new-user-accounts-linux-instance/) 
 1. Acessar EC2
     * PS. *(Troque para arquivo PEM e DNS corretos)*:  
-      * `sudo ssh -i "./server/config/aws/free.pem" ubuntu@ec2-18-220-205-21.us-east-2.compute.amazonaws.com`
+      * Colocar *./server/config/toogs/config.ssh.local* e *key.pem* em *~/.ssh/* 
+      * `ssh -v webserver`
       * Ou script em *./server/config/tools*
+        * Pode dar: `export ip_remoto=<numero do ip remoto>`
 1. Clonar repositório
     * `cd ~`
     * `git clone https://github.com/rauleite/video.git`
 1. Copiar **config** para remoto. Na máquina local fazer
     * PS. *(Troque para path, PEM  e DNS corretos)*
-        * `sudo scp -i server/config/aws/free.pem ./config.tar.gz ubuntu@ec2-18-220-205-21.us-east-2.compute.amazonaws.com:~/video`
+        * `scp ./config.tar.gz webserver:~/`
+        <!-- * `sudo scp -i server/config/aws/free.pem ./config.tar.gz ubuntu@ec2-18-220-205-21.us-east-2.compute.amazonaws.com:~/video` -->
+        * Ou script em *./server/config/tools*
+          * Pode dar: `export ip_remoto=<numero do ip remoto>`
 1. Volte pra raiz do projeto **remoto**
     * `cd /video`
-    * `sudo tar -zxvf config.tar.gz`
+    * `sudo tar -zxvf config.tar.gz && sudo rm -r ./config.tar.gz`
     * Se necessário: `sudo chgrp root config && sudo chown root config`
 1. Instalar [docker](https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/) e [docker-compose](https://docs.docker.com/compose/install/#install-compose)
 1. Gerar arquivos *server/build* e *web/buid*
@@ -76,7 +171,7 @@ Todos os comandos aqui descritos, consideram que você está no projeto raiz (um
 1. Acessar em melhore.me
 1. Remover *config.tar.gz* local e remoto.
 1. Run:
-    * `yarn prod`
+    * `yarn up:prod:build`
 
 ---
 ### Ambiente Prod (Servidor - PRÓXIMAS VEZES)
@@ -86,9 +181,9 @@ Todos os comandos aqui descritos, consideram que você está no projeto raiz (um
 ### Simular Ambiente Prod em local(Servidor - PRÓXIMAS VEZES)
 Teste o ambiente de produção na sua máquina. Neste caso, não será utilizado nenhuma dependência da sua máquina, mas sim será montado todo o container virtual que rodará em produção, na sua máquina). Porém os sguintes arquivos são compartilhados: *./web/config/proxy/nginx.conf* e *./web/config/proxy/default* 
 1. Apontar dns *127.0.0.1 melhore-local.me* em **/etc/hosts** e testar http://melhore-local.me
-1. Run
-    * `yarn prod`
-    * `yarn prod:light` (sem builds de deploy e nem --build do container)
+1. Run um dos dois:
+    * `yarn up:local:proxy`
+    * `yarn up:local:proxy:build` (sem builds de deploy e nem --build do container)
 1. Será criado (ou substituído) o diretório **build** em *web* que pode ser excluído a qualquer momento, caso queira.
     * Exclua diretamente, ou `rm:build:web`
 
@@ -131,8 +226,8 @@ Teste o ambiente de produção na sua máquina. Neste caso, não será utilizado
         * `docker network rm $(docker network ls | tail -n+2 | awk '{if($2 !~ /bridge|none|host/){ print $1 }}')`
 
 ### Procedimentos máquina remota (EC2)
-* Criar rede compartilhada:
-    * `docker network create -d bridge --subnet 192.168.0.0/24 --gateway 192.168.0.1 proxynet`
+<!-- * Criar rede compartilhada:
+    * `docker network create -d bridge --subnet 192.168.0.0/24 --gateway 192.168.0.1 proxynet` -->
 <!-- 1. "Fechar porta 21"
     * `sudo ufw deny 21` -->
 * Instalar [Lynis](https://www.digitalocean.com/community/tutorials/how-to-perform-security-audits-with-lynis-on-ubuntu-16-04) para auditar máquina remota.   
@@ -142,7 +237,8 @@ Teste o ambiente de produção na sua máquina. Neste caso, não será utilizado
 * Ver Docker Sec
     * [docker-bench-security](https://github.com/docker/docker-bench-security)
 * Logar conexões SSH
-    * `iptables -I INPUT -p tcp -m tcp --dport 22 -m state --state NEW -j LOG --log-level 1 --log-prefix "New Connection "`
+    * `sudo iptables -I INPUT 1 -p tcp -m tcp --dport 22 -m state --state NEW -j LOG --log-level 1 --log-prefix "New Connection "`
+    * `sudo netfilter-persistent save`
     * log registrado em: */var/log/kern.log* e */var/log/syslog*
 * Considerar instalar [Webmin](http://www.webmin.com/deb.html). Contra: ter que liberar mais uma porta de acesso do servidor remoto.
 * Instalar [Fail2Ban](https://www.digitalocean.com/community/tutorials/how-to-protect-ssh-with-fail2ban-on-ubuntu-14-04), pra monitorar tentativas de conexão SSH.
@@ -183,6 +279,23 @@ ERROR: for mem  Cannot create container for service mem: Conflict. The container
   * B) Ou apagar todos os containers (Cuidado)
     * `docker rm -f $(docker ps -a -q)`
 
+```
+Read-only no /
+```
+**Causa:** Algum pacote ou comando, alterou pra *ro* seu root (ou outra partição) 
+**Solução:** 
+  * `mount | grep "(ro"`
+  * `mount -o remount,rw /` (ou outra partição)
+
+# Extra:
+  * Limpeza, principalmente se o volume do ec2 for pequeno:
+      * `sudo du -sh /var/cache/apt/archives/` então, `sudo apt clean`
+      * `sudo apt-get autoremove --purge`
+      * `sudo apt remove <package 1> <package 2>`
+      * `dpkg -l | awk '/^rc/ {print $2}' | xargs sudo dpkg --purge`
+      * `sudo deborphan | xargs sudo apt-get -y remove --purge`
+      * `sudo find /var/log -type f -name "*.gz" -exec rm -f {} \`
+      
 ---
 
 ## [Create React App](https://github.com/facebookincubator/create-react-app).
