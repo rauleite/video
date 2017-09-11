@@ -45,9 +45,9 @@ Todos os comandos aqui descritos, consideram que você está no projeto raiz (um
 
 1. Usar versões de node indicado em *./package.json*.
     * Recomendo instalar via [NVM](https://github.com/creationix/nvm#installation)
-    * PS. *(Troque pela versão correta)*  
-    `nvm install 8.4.0`  
-    `nvm alias default 8.4.0`
+    * PS. *(Troque pela versão correta)*
+        * `nvm install 8.4.0`
+        * `nvm alias default 8.4.0`
 1. Pre requisito
     * `sudo apt-get install build-essential -y`
 1. Ao invés de usar NPM use [Yarn](https://yarnpkg.com/lang/en/docs/install)
@@ -55,19 +55,19 @@ Todos os comandos aqui descritos, consideram que você está no projeto raiz (um
     * `yarn install:app`
 1. Sempre que precisar rodar o app (cada comando em terminais diferente):
     * Opção 1 (Recomendado)
-      * `yarn env`
-      * `yarn app`
+        * `yarn env`
+        * `yarn app`
     * Opção 2
-      * `yarn env`
-      * `yarn weeb`
-      * `yarn server`
+        * `yarn env`
+        * `yarn weeb`
+        * `yarn server`   
     * Opção 3
-      * `yarn db`
-      * `yarn mem`
-      * `yarn web`
-      * `yarn server`
+        * `yarn db`
+        * `yarn mem`
+        * `yarn web`
+        * `yarn server`
     * Opção 4
-      * `yarn all`
+        * `yarn all`
 
 1. Abrirá: *localhost:3001*.
 1. Olhar *scripts* em *./package.json*, para mais comandos úties.
@@ -79,79 +79,125 @@ Todos os comandos aqui descritos, consideram que você está no projeto raiz (um
 1. Acessar primeira vez (comando ssh regular):
     * `sudo ssh -i "./server/config/aws/free.pem" ubuntu@<18.220.205.21>`
 1. Fazer snapshot do ebs de home e user
+
+---
+**Por enquanto ainda não mountar**
 1. Montar separadamente
     * Drivers:
-      1. xvda: /root 9, /var 3, /tmp 2 
-      1. xvdb: /home 8 (volume enctypted)
-      1. xvdc: /usr 8 (mount ro)
+        * (VER BOOT) e SWAP
+        1. xvda: /root 9, /var 3, /tmp 2
+        1. xvdb: /home 8 (volume enctypted)
+        1. xvdc: /usr 8 (mount ro)
     1. Criar nova instância (second)
     1. Atached o volume root (primary), na segundária com ela ligada
-    1. Instalar Gui no Secondary para particionar o root em 3 [Gparted](https://techloverhd.com/2015/05/install-lxde-vnc-gui-on-ubuntu-debian-server/)
-        * Tomar cuidado pra não alterar o LABEL da raiz (/)
-        * Por LABEL no resto (ex. home, usr, var, tmp)  
+    1. Alternativa GUI: Se precisar, instalar Gui no Secondary para particionar o root em 3 [Gparted](https://techloverhd.com/2015/05/install-lxde-vnc-gui-on-ubuntu-debian-server/)
+        1. Apos comando abaixo, editar *xtartup* conforme pagina acima.
+        ```
+        sudo apt-get update -y && \
+        sudo apt-get upgrade -y && \
+        sudo apt-get install nano xorg lxde-core tightvncserver -y && \
+        vncserver && \
+        vncserver -kill :1 && \
+        sudo nano ~/.vnc/xstartup
+        ```
+        ```
+        # ~/.vnc/xstartup
+        lxterminal &
+        /usr/bin/lxsession -s LXDE &
+        ```
+        1. KRDC - VPN Client
+            * `sudo apt install krdc`
+        1. Ligar porta 5901
+        1. Tomar cuidado pra não alterar o LABEL da raiz (/)
+    1. Por LABEL no resto (ex. home, usr, var, tmp)
+        * `e2label /dev/xvdf home`
     1. Depois de drivers montado, copiar. Ex
         * Formatar dev único do /home e /usr (CUIDADO: dev do root não pode)
-          * `mkfs -t ext4 /dev/xvdg` (home)
-          * `mkfs -t ext4 /dev/xvdh` (usr)
+            * `mkfs -t ext4 /dev/xvdg` (home)
+            * `mkfs -t ext4 /dev/xvdh` (usr)
         * Copiar
-          * `sudo rsync -avh --progress /mnt/root/tmp /mnt/tmp/`
-          * `sudo rsync -avh --progress /mnt/root/var /mnt/var/`
-          * `sudo rsync -avh --progress /mnt/root/home /mnt/home/`
-          * `sudo rsync -avh --progress /mnt/root/usr /mnt/usr/`
+            * `sudo rsync -avh --progress /mnt/root/tmp /mnt/tmp/`
+            * `sudo rsync -avh --progress /mnt/root/var /mnt/var/`
+            * `sudo rsync -avh --progress /mnt/root/home /mnt/home/`
+            * `sudo rsync -avh --progress /mnt/root/usr /mnt/usr/`
     1. Desligar Second, detached tudo (exceto root dela mesma)
-    1. Atach root na Primary com nome **sda1**, ligar e atach o resto (home e usr). 
+    1. Atach root na Primary com nome **sda1**, ligar e atach o resto (home e usr).
     1. Conferir LABLES. Se der algo errado com LABEL, fazer com UUID.
-      * `sudo file -s /dev/xvda1`
-      * `sudo file -s /dev/xvda2`
-      * etc
+        * `sudo file -s /dev/xvda*`
+        * etc
     1. Fazer as alterações em /etc/fstab. Seguir sequência
         ```
-        # Respeitar a raiz que já existe:
-        # LABEL= /    ext4 defaults 0 0`
-        LABEL=home  /home ext4 defaults 0 1
-        LABEL=tmp   /tmp  ext4 defaults 0 1
-        LABEL=usr   /usr  ext4 ro       0 1
-        LABEL=var   /var  ext4 defaults 0 1
+        # Respeitar a raiz (/) que já existe:
+        # Se raiz for sequencia 0, inciar entao pelo 1
+        # Usr - Opções default exceto pelo ro
+        LABEL=home  /home   auto   defaults,nofail                  0 1
+        LABEL=tmp   /tmp    auto   defaults,nofail,noexec           0 1
+        # LABEL=usr   /usr    auto   defaults                       0 1
+        LABEL=var   /var    auto   defaults                         0 1
+        # Testar só com rw,noatime e ro,noatime
         ```
+
+        ```
+        # Exemplos Diversos
+        LABEL=boot	/boot     	ext4      	rw,noatime	0 2
+
+        #TMPFS
+        tmpfs       /tmp        tmpfs       defaults,noatime,nosuid,nodev,noexec,mode=1777,size=1G 0 
+        tmpfs		/var/cache	tmpfs		defaults,noatime,nosuid,noexec				0 0
+        tmpfs		/var/tmp	tmpfs		defaults,noatime,nosuid,noexec,size=30m			0 0
+        tmpfs		/var/log	tmpfs		defaults,noatime,nosuid,noexec,mode=0755,size=100m		0 0
+        tmpfs		/run		tmpfs		defaults,noatime,nosuid,noexec,mode=0755,szie=2m		0 0
+        ```
+
+
     1. Renomear originais
         * `sudo mv home home_BACK`
         * `sudo mv tmp tmp_BACK`
         * `sudo mv usr usr_BACK`
         * `sudo mv var var_BACK`
+    1. Criar pontos da montagem
+        * `sudo mkdir home`
+        * `sudo mkdir tmp`
+        * `sudo mkdir usr`
+        * `sudo mkdir var`
+    1. Acesso tmp
+        * `sudo chmod 777 tmp`
     * [/home](https://help.ubuntu.com/community/Partitioning/Home/Moving)
-      * Fazer sem a versão encryptada (o drive já é)
-      * ext4 em fstab
-      * `sudo fdisk -l`
-      * `sudo mkfs -t ext4 /dev/xvdb`  
-      * `sudo file -s /dev/xvdb`  
-      * UUID: `sudo file -s /dev/xvdb`
-      * Confirmar root: `sudo file -s /dev/xvda1` (`fdisk -l`, pode ajudar)
-      * `sudo mkdir -p /media/ubuntu/linux-root/ && sudo mkdir -p /media/ubuntu/linux-home/`
-      * `sudo mount /dev/xvda1 /media/ubuntu/linux-root/`
-      * `sudo rsync -aXS /media/ubuntu/linux-root/home/. /media/ubuntu/linux-home/.`
+        * Fazer sem a versão encryptada (o drive já é)
+        * ext4 em fstab
+        * `sudo fdisk -l`
+        * `sudo mkfs -t ext4 /dev/xvdb`
+        * `sudo file -s /dev/xvdb`
+        * UUID: `sudo file -s /dev/xvdb`
+        * Confirmar root: `sudo file -s /dev/xvda1` (`fdisk -l`, pode ajudar)
+        * `sudo mkdir -p /media/ubuntu/linux-root/ && sudo mkdir -p /media/ubuntu/linux-home/`
+        * `sudo mount /dev/xvda1 /media/ubuntu/linux-root/`
+        * `sudo rsync -aXS /media/ubuntu/linux-root/home/. /media/ubuntu/linux-home/.`
 
-      * Troubleshooting: Lembrar de mount root
-        * `mkdir </media/.../linux-root>`
-        * `mount /etc/<xvda1> /</media/.../linux-root>`
-        * `mkdir <command dest>`
+        * Troubleshooting: Lembrar de mount root
+                * `mkdir </media/.../linux-root>`
+                * `mount /etc/<xvda1> /</media/.../linux-root>`
+                * `mkdir <command dest>`
     * [/var](https://gist.github.com/qiaolun/4152330)
-      * *./server/config/aws/mount_var.sh*
+        * *./server/config/aws/mount_var.sh*
+---
+
 1. [knockd](https://www.digitalocean.com/community/tutorials/how-to-use-port-knocking-to-hide-your-ssh-daemon-from-attackers-on-ubuntu) para não precisar ter IP local fixo
     * Troubleshouting
-      * `sudo apt install netfilter-persistent`
-      * `sudo service netfilter-persistent start`
-      * `sudo apt install knockd` (remoto e local)
+        * `sudo apt install netfilter-persistent`
+        * `sudo service netfilter-persistent start`
+        * `sudo apt install knockd` (remoto e local)
     * Não *Deny* tudo, como no tutorial, o Sec Group do EC2 já faz isto, fazer:
-      * Instruções: *./server/aws/iptb_rules.v4.v6*
+        * Instruções: *./server/aws/iptb_rules.v4.v6*
     * Basear conf em ./server/aws/default_knockd
-      * `sudo netfilter-persistent save` 
-1. [Criar novo usuário, com acesso ssh e apagar o default](https://aws.amazon.com/pt/premiumsupport/knowledge-center/new-user-accounts-linux-instance/) 
+        * `sudo netfilter-persistent save`
+1. [Criar novo usuário, com acesso ssh e apagar o default](https://aws.amazon.com/pt/premiumsupport/knowledge-center/new-user-accounts-linux-instance/)
 1. Acessar EC2
-    * PS. *(Troque para arquivo PEM e DNS corretos)*:  
-      * Colocar *./server/config/toogs/config.ssh.local* e *key.pem* em *~/.ssh/* 
-      * `ssh -v webserver`
-      * Ou script em *./server/config/tools*
-        * Pode dar: `export ip_remoto=<numero do ip remoto>`
+    * PS. *(Troque para arquivo PEM e DNS corretos)*:
+        * Colocar *./server/config/toogs/config.ssh.local* e *key.pem* em *~/.ssh/*
+        * `ssh -v webserver`
+        * Ou script em *./server/config/tools*
+            * Pode dar: `export ip_remoto=<numero do ip remoto>`
 1. Clonar repositório
     * `cd ~`
     * `git clone https://github.com/rauleite/video.git`
@@ -160,7 +206,7 @@ Todos os comandos aqui descritos, consideram que você está no projeto raiz (um
         * `scp ./config.tar.gz webserver:~/`
         <!-- * `sudo scp -i server/config/aws/free.pem ./config.tar.gz ubuntu@ec2-18-220-205-21.us-east-2.compute.amazonaws.com:~/video` -->
         * Ou script em *./server/config/tools*
-          * Pode dar: `export ip_remoto=<numero do ip remoto>`
+            * Pode dar: `export ip_remoto=<numero do ip remoto>`
 1. Volte pra raiz do projeto **remoto**
     * `cd /video`
     * `sudo tar -zxvf config.tar.gz && sudo rm -r ./config.tar.gz`
@@ -179,7 +225,7 @@ Todos os comandos aqui descritos, consideram que você está no projeto raiz (um
 
 ---
 ### Simular Ambiente Prod em local(Servidor - PRÓXIMAS VEZES)
-Teste o ambiente de produção na sua máquina. Neste caso, não será utilizado nenhuma dependência da sua máquina, mas sim será montado todo o container virtual que rodará em produção, na sua máquina). Porém os sguintes arquivos são compartilhados: *./web/config/proxy/nginx.conf* e *./web/config/proxy/default* 
+Teste o ambiente de produção na sua máquina. Neste caso, não será utilizado nenhuma dependência da sua máquina, mas sim será montado todo o container virtual que rodará em produção, na sua máquina). Porém os sguintes arquivos são compartilhados: *./web/config/proxy/nginx.conf* e *./web/config/proxy/default*
 1. Apontar dns *127.0.0.1 melhore-local.me* em **/etc/hosts** e testar http://melhore-local.me
 1. Run um dos dois:
     * `yarn up:local:proxy`
@@ -188,16 +234,18 @@ Teste o ambiente de produção na sua máquina. Neste caso, não será utilizado
     * Exclua diretamente, ou `rm:build:web`
 
 #### Dicas
-  * Arquivos para mudar configurações do Nginx:
+
+* Arquivos para mudar configurações do Nginx:
     * *./web/config/proxy/nginx.conf*
     * *./web/config/proxy/default*
-  * Para acessar o container proxy
+* Para acessar o container proxy
     * `docker exec -it proxy sh`
-  * Para reiniciar Nginx, de dentro do container
+* Para reiniciar Nginx, de dentro do container
     * `nginx -s reload`
 
 ---
 ## Comandos úteis
+
 * Ao testar Nginx, localmente:
     * Se mudar ./web
         * `yarn build:web && yarn up:local:proxy`
@@ -215,7 +263,7 @@ Teste o ambiente de produção na sua máquina. Neste caso, não será utilizado
     * `docker-compose db`
 * Compactar **config**, de *./server* e *./web*
     * `sudo tar -zcvf config.tar.gz server/config/ web/config/`
-* Remover coisas no Docker (cuidado): 
+* Remover coisas no Docker (cuidado):
     * Remover todos os containers:
         * `docker rm -f $(docker ps -a -q)`
     * Remover todas as imagens:
@@ -230,7 +278,7 @@ Teste o ambiente de produção na sua máquina. Neste caso, não será utilizado
     * `docker network create -d bridge --subnet 192.168.0.0/24 --gateway 192.168.0.1 proxynet` -->
 <!-- 1. "Fechar porta 21"
     * `sudo ufw deny 21` -->
-* Instalar [Lynis](https://www.digitalocean.com/community/tutorials/how-to-perform-security-audits-with-lynis-on-ubuntu-16-04) para auditar máquina remota.   
+* Instalar [Lynis](https://www.digitalocean.com/community/tutorials/how-to-perform-security-audits-with-lynis-on-ubuntu-16-04) para auditar máquina remota.
 * Test Vulnerabilidades Web ([wapiti](https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-on-ubuntu-14-04))
     *  `wapiti https://18.220.205.21 -n 20 -b folder`
 
@@ -247,6 +295,7 @@ Teste o ambiente de produção na sua máquina. Neste caso, não será utilizado
 * Analisar estas [ferramentas de segurança](https://www.thefanclub.co.za/how-to/how-secure-ubuntu-1604-lts-server-part-1-basics)
 
 ## Scripts Bash
+
 * SSH
     * *./server/config/tools/ec2-video.sh*
     * Se necessário alterar *host="/home/raul/dev/video"*
@@ -274,16 +323,17 @@ ERROR: for mem  Cannot create container for service mem: Conflict. The container
 **Causa:** Quando altera arquivo raiz do projeto e tenta subir novamente o container. Ou algum container antigo está em desuso, mas não foi apagado
 
 **Solulção:** Limpar containers (este comando limpa todos de uma vez, mas pode remover apenas os que estão em conflito, como *mem* ou *db* por ex.)
-  * A) Apagar o container em questão
+
+1. Apagar o container em questão
     * `docker rm <mem>`
-  * B) Ou apagar todos os containers (Cuidado)
+1. Ou apagar todos os containers (Cuidado)
     * `docker rm -f $(docker ps -a -q)`
 
 ```
 Read-only no /
 ```
-**Causa:** Algum pacote ou comando, alterou pra *ro* seu root (ou outra partição) 
-**Solução:** 
+**Causa:** Algum pacote ou comando, alterou pra *ro* seu root (ou outra partição)
+**Solução:**
   * `mount | grep "(ro"`
   * `mount -o remount,rw /` (ou outra partição)
 
@@ -295,7 +345,7 @@ Read-only no /
       * `dpkg -l | awk '/^rc/ {print $2}' | xargs sudo dpkg --purge`
       * `sudo deborphan | xargs sudo apt-get -y remove --purge`
       * `sudo find /var/log -type f -name "*.gz" -exec rm -f {} \`
-      
+
 ---
 
 ## [Create React App](https://github.com/facebookincubator/create-react-app).
@@ -2055,7 +2105,7 @@ If you’re using [Apache HTTP Server](https://httpd.apache.org/), you need to c
     RewriteRule ^ index.html [QSA,L]
 ```
 
-It will get copied to the `build` folder when you run `npm run build`. 
+It will get copied to the `build` folder when you run `npm run build`.
 
 If you’re using [Apache Tomcat](http://tomcat.apache.org/), you need to follow [this Stack Overflow answer](https://stackoverflow.com/a/41249464/4878474).
 
