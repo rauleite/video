@@ -1,7 +1,5 @@
 FROM node:8.4.0-alpine
 
-MAINTAINER rauleite
-
 ENV path /server
 
 COPY config ${path}/config

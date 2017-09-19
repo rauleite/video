@@ -2,14 +2,14 @@
   "name": "video",
   "version": "0.1.0",
   "license": "MIT",
-  "engines": {
-    "node": "^8.4.0",
-    "npm": "^5.3.0"
-  },
   "dependencies": {
     "cross-env": "^5.0.5",
     "npm-run-all": "^4.0.2",
     "shx": "^0.2.2"
+  },
+  "engines" : {
+    "node" : ">=8.5.0",
+    "npm" : ">=3.5.0"
   },
   "scripts": {
     "install:app": "yarn install && run-p install:web install:server",
@@ -18,25 +18,30 @@
     "all": "run-p env app",
     
     "up:local:proxy:build": "cross-env NODE_ENV=development && yarn build:web && yarn up:local:proxy -- --build",
-    "up:local:proxy": "docker-compose -f dkcp-local-proxy.yml up",
+    "up:local:proxy":       "docker-compose -f dkcp-local-proxy.yml up",
 
-    "up:prod:build": "cross-env NODE_ENV=production && yarn build:web && yarn up:prod -- --build",
-    "up:prod": "docker-compose -f dkcp-prod.yml up",
+    "up:prod:build":  "cross-env NODE_ENV=production && yarn build:web && yarn up:prod -- --build",
+    "up:prod":        "docker-compose -f dkcp-prod.yml up",
 
     "clean:app": "run-p clean:web clean:server",
     
-    "web": "cd ./web && cross-env NODE_ENV=development PORT=3001 && yarn start",
+    "web":    "cd ./web && cross-env NODE_ENV=development PORT=3001 && yarn start",
     "server": "cd ./server && export NODE_ENV=development PORT=3000 && yarn dev",
     
-    "install:web": "cd ./web && yarn install",
+    "install:web":    "cd ./web && yarn install",
     "install:server": "cd ./server && yarn install",
-    "install:prod": "yarn install && yarn install:web && yarn build:server",
+    "install:prod":   "yarn install && yarn install:web && yarn build:server",
     
-    "build:web": "cd ./web && yarn build",
-    "build:server": "cd ./server && yarn build",
-    "build:app": "run-p build:web build:server",
+    "build:web":    "cd ./web && yarn build",
+    "build:server": "cd ./server && npm run build",
+    "build:app":    "run-p build:web build:server",
     
-    "clean:web": "shx rm -rf web/build",
-    "clean:server": "shx rm -rf server/build"
+    "clean:web":    "shx rm -rf web/build",
+    "clean:server": "shx rm -rf server/build",
+
+    "uninstall:root":    "shx rm -rf node_modules yarn.lock",
+    "uninstall:web":     "yarn clean:web && shx rm -rf web/node_modules web/yarn.lock",
+    "uninstall:server":  "yarn clean:server && shx rm -rf server/node_modules server/yarn.lock",
+    "uninstall:app":     "yarn uninstall:web && yarn uninstall:server && yarn uninstall:root"
   }
 }

@@ -4,6 +4,10 @@
   "private": true,
   "license": "MIT",
   "proxy": "http://localhost:3000",
+  "engines" : {
+    "node" : ">=8.5.0",
+    "npm" : ">=3.5.0"
+  },
   "dependencies": {
     "hellojs": "^1.15.1",
     "material-ui": "^0.17.0",
