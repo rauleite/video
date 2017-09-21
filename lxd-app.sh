@@ -4,18 +4,18 @@
 # CT_USER="root"
 # NETWORK="lxcbr0"
 # LOCAL_PATH="$(pwd)"
-NETWORK="lxcbr01"
+# NETWORK="lxcbr01"
 
 ### Dependencia ###
 source ./server/config/lxd/lxd-lib.sh
 
 ### MY VARS ###
-web_vm="/www"
+web_vm="/var/www"
 web_local="./web"
-server_vm="/server"
+server_vm="/var/server"
 server_local="./server"
 
-FROM app/node-850/npm-530/yarn/nginx/redis
+FROM ubuntu/user
 
 # Build ou Updates on VM
 EXEC_FILE "$server_local/config/lxd/lxd-file-app.sh"

@@ -11,7 +11,7 @@ source ./server/config/lxd/lxd-lib.sh
 db_vm="/db"
 db_local="./server"
 
-FROM db/mongod349
+FROM ubuntu/user
 
 # Build ou Updates on VM
 EXEC_FILE "$db_local/config/lxd/lxd-file-db.sh"
