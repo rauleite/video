@@ -40,8 +40,23 @@ Ambiente como persistência em ram e banco de dados, será entregue pronto (virt
 Todos os comandos aqui descritos, consideram que você está no projeto raiz (um nível antes dos apps *server* e *web*).
 <!-- 1. Apontar dns ***127.0.0.1 melhore-local.me*** em **/etc/hosts** -->
 <!-- Baixar e descompactar na raiz do projeto o diretório **config** no diretório *server* *(**config** fica em cloud separada e não no repositório do projeto)* -->
+
+# Setar scripts ao path
+`vim ~/.bashrc`
+```
+PROJETO=$HOME/dev/video
+APP_SH_PATH=$PROJETO/server/config/scripts
+PATH=$PATH:$APP_SH_PATH/bin:$APP_SH_PATH/src
+```
 1. Clonar repo do projeto
     * `git clone https://github.com/rauleite/video`
+
+
+
+
+
+
+## Configuracoes antigas pre LXD ----------
 
 1. Usar versões de node indicado em *./package.json*.
     * Recomendo instalar via [NVM](https://github.com/creationix/nvm#installation)

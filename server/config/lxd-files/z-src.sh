@@ -1,10 +1,11 @@
 #!/bin/bash
 update () {
     echo 'Conectando: archive.ubuntu.com'
-    until ping -c1 archive.ubuntu.com &>/dev/null; do :; done
+    until nc -vzw 2 archive.ubuntu.com 22; do sleep 1; done    
+
     echo "Ok"
     echo 'Conectando: security.ubuntu.com'    
-    until ping -c1 security.ubuntu.com &>/dev/null; do :; done
+    until nc -vzw 2 security.ubuntu.com 22; do sleep 1; done        
     echo "Ok"
     sudo apt-get update
 }

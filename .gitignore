@@ -15,7 +15,7 @@ tests.js
 **/.yarnclean
 /www/config/*
 /server/config/*
-!/server/config/tools/
-!/server/config/lxd/
+!/server/config/lxd-files/
+!/server/config/scripts/
 
 # */**/yarn.lock

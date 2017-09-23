@@ -1,11 +1,14 @@
 #!/bin/bash
-# Usado para configuracoes especificas de perfis de vm (containers), apartir de uma imagem base
-# Esta imagem pode ja estar com configuracoes essenciais (que sirvam para todas as maquinas) prontas
-# Execute um arquivo na vm, copie arquivos, execute comandos.
-# Geralmente ele eh usado na sequencia apos o script de build from raw (hell ...hehehe).
+# Este script montara um novo container, apartir de uma imagem base, ou entao usara um container
+# ja existente ao informar o nome deste (container).
+# 
+# Quando criado novo container, q imagem base (FROM) normalmente ja estara com configuracoes essenciais 
+# prontas (montadas apartir do script de build)
+# 
+# Execute um arquivo na vm, copie arquivos, execute comandos como inciar aplicacoes.
 
 ### Dependencia ###
-source ./server/config/lxd/lxd-lib.sh
+source lxd-file-lib.sh
 
 ### MY VARS ###
 host_local="."
@@ -22,7 +25,9 @@ FROM ubuntu/user
 ENV $web_vm $server_vm
 
 # Build ou Updates na VM - Executaveis na frente, libs (caso haja, por ultimo)
-EXEC_FILE "$server_local/config/lxd/lxd-file-app.sh" "$server_local/config/lxd/lxd-file-zlib.sh"
+FILES \
+    "$server_local/config/lxd-files/app.sh" \
+    "$server_local/config/lxd-files/z-src.sh"
 
 # Executa shell na maquina host. Bom para fazer o build local, antes de 
 # enviar a vm

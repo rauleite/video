@@ -12,12 +12,12 @@
   "scripts": {
     "dev":          "nodemon -w src --exec \"babel-node src --presets es2015,stage-0\"",
     "build":        "babel src -s -D -d build --presets es2015,stage-0",
-    "start":        "pm2 start ecosystem.config.js --only app",
-    "restart":      "pm2 restart ecosystem.config.js --only app",
-    "stop":         "pm2 stop ecosystem.config.js --only app",
-    "reload":       "pm2 reload ecosystem.config.js --only app",
-    "logs":         "pm2 logs app",
-    "show":         "pm2 show app",
+    "start":        "sudo pm2 start ecosystem.config.js --only app",
+    "restart":      "sudo pm2 restart ecosystem.config.js --only app",
+    "stop":         "sudo pm2 stop ecosystem.config.js --only app",
+    "reload":       "sudo pm2 reload ecosystem.config.js --only app",
+    "logs":         "sudo pm2 logs app",
+    "show":         "sudo pm2 show app",
     "prestart_old": "yarn run -s build",
     "test":         "eslint src"
   },

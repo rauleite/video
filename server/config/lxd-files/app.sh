@@ -1,6 +1,6 @@
 #!/bin/bash
 # Estara na mesma raiz remota (também)
-source ~/lxd-file-zlib.sh
+source ~/z-src.sh
 
 ### ADD REPO ### -------------------
 ### nginx ###
@@ -13,8 +13,8 @@ update
 
 
 ### INSTALLS ### --------------------
-### netdata ###
-instala_netdata
+# ### netdata ###
+# instala_netdata
 ### node ###
 exists "node"
 if [[ $? != 0 ]]
@@ -23,7 +23,6 @@ then
         sudo rm -r n &>/dev/null 
         git clone https://github.com/tj/n.git && \
         cd n && \
-            echo $USER
             sudo make install 
             # Resolve problema de acesso primeira vez
             sudo n ls &>/dev/null
@@ -53,13 +52,11 @@ sudo service redis_6379 start
 sudo service redis_6379 stop
 
 ### PM2 ###
+
 exists "pm2"
 if [[  $? != 0 ]]
 then
-    # sudo -H -u $user_name bash -c "sudo npm install pm2@latest -g"
-    # sudo -H -u $user_name bash -c "sudo yarn global add pm2@latest"
-    # sudo npm install pm2@latest -g
-    sudo yarn global add pm2@latest
+    sudo npm install pm2@latest -g
 fi
 
 # Habilita on startup
