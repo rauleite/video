@@ -1,0 +1,6 @@
+Host webserver
+  HostName 13.59.64.235
+  User rleite
+  #User ubuntu
+  IdentityFile ~/.ssh/free.pem
+  ProxyCommand bash -c '/usr/bin/knock %h 80 443 80; sleep 1; exec /bin/nc %h %p'

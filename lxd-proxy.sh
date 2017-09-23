@@ -1,7 +1,7 @@
 #!/bin/bash
 # Config
 NETWORK="lxcbr01"
-IMAGE_FROM="proxy/ha172/redis"
+IMAGE_FROM="ubuntu/user"
 ### Dependencia ###
 # namefile=$(basename "$0")
 

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Alterar variavel host se necessário
+# No terminal fazer: ec2-video.sh <13.59.195.165>
+
+host="/home/$USER/dev/video"
+
+# if not null
+if ! [ -z $1 ]; then
+    ip_remoto=$1
+fi
+
+remote_user="ubuntu"
+pem="$host/server/config/aws/free.pem"
+run="sudo ssh -i $pem $remote_user@$ip_remoto"
+
+echo $run
+
+$run
+# dns_ip="ec2-${ip_remoto//./-}"
+# dns_zone=".us-east-2.compute.amazonaws.com"
+# run="sudo ssh -i $pem $remote_user@$dns_ip$dns_zone"

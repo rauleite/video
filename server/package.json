@@ -15,7 +15,9 @@
     "start":        "pm2 start ecosystem.config.js --only app",
     "restart":      "pm2 restart ecosystem.config.js --only app",
     "stop":         "pm2 stop ecosystem.config.js --only app",
-    "logs":         "pm2 logs ecosystem.config.js --only app",
+    "reload":       "pm2 reload ecosystem.config.js --only app",
+    "logs":         "pm2 logs app",
+    "show":         "pm2 show app",
     "prestart_old": "yarn run -s build",
     "test":         "eslint src"
   },

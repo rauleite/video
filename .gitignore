@@ -3,17 +3,19 @@
 # modulo SERVER
 
 # modulo WEB
-web/src/**/*.css
+www/src/**/*.css
 
 # todos modulos
 **/node_modules
 **/build
-*/config
 **/config.tar.gz
 */.DS_Store
 */**/*.log
 tests.js
 **/.yarnclean
-
+/www/config/*
+/server/config/*
+!/server/config/tools/
+!/server/config/lxd/
 
 # */**/yarn.lock

@@ -1,7 +1,7 @@
 module.exports = {
   apps : [{
     name        : "app",
-    script      : "./server/build",
+    script      : "./build",
     watch       : true,
     instances   : 1,
     env: {
@@ -11,6 +11,7 @@ module.exports = {
     env_production : {
       "NODE_ENV": "production",
       "MONGO_HOST": "db",
+      "TESTE_RSYNC": "teste",
     }
   },{
     name       : "api-app",
