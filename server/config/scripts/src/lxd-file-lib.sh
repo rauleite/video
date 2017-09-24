@@ -36,38 +36,26 @@ read ct_name
 
 [[ -z $ct_name ]] && exit 1
 
-# Se nao existir conteiner
 network=""
-lxc config show $ct_name &>/dev/null
-if [[ $? != 0 ]]
-then
+function attach_network () {
     lxc network list
     echo_quest "Nome da Conexao Bridge."
     read network_read
     [[ -z $network_read ]] && exit 1
     network=$network_read
-fi
+    lxc network attach $network $ct_name &>/dev/null
+}
+# function create_network () {
+#     until_host $ct_name
+#     echo_info "creanting network $network"
+#     lxc network create $network 
+#     echo_info "a $network"
+# }
 
 ### UTILS ###
-### traps ###
-# function cleanup {
-#     echo_info "Removing /tmp/foo"
-#     echo_info ""    
-#     lxc restart $ct_name
-# }
-# trap cleanup EXIT
-
-
-
 back_to_local_path () {
     cd $LOCAL_PATH
 }
-# until_host () {
-#     echo_info "Testando conexao com $ct_name"    
-#     lxc exec $ct_name -- sh -c "until nc -vzw 2 $1 22; do sleep 1; done"    
-#     echo_info "Ok"        
-# }
-
 ## USO APENAS DO LIB ###
 function USER_EXEC () {
     back_to_local_path
@@ -75,14 +63,6 @@ function USER_EXEC () {
     # lxc exec $ct_name -- sudo -H -u $user_name bash -c "$*"    
     exec_cmd_user "$*"
 }
-# function SUDO_EXEC () {
-#     back_to_local_path
-#     # echo "[ SUDO_EXEC ] $*"
-#     # ssh $user_name@$ip "sh -c $*" || exit 1
-#     # lxc exec $ct_name --mode=non-interactive -- sh -c "$*" || exit 1
-#     USER_EXEC "sudo $*" || exit 1
-# }
-
 install_rsync () {
     rsync --version &>/dev/null
     if [[ $? != 0 ]]
@@ -95,12 +75,8 @@ install_rsync () {
         sudo apt-get -y install rsync 
     fi
 }
-# function rsync_sudo () {
-#     # rsync -r -a -e ssh --delete-during --chown=$user_name:$user_name --rsync-path="sudo rsync" $*
-#     rsync -r -a -e ssh --chown=$user_name:$user_name --rsync-path="sudo rsync" $*
-# }
 ip=""
-read_ip () {
+function read_ip () {
     lxc list $ct_name
     echo_quest "IP de $ct_name"
     read ip_read
@@ -109,26 +85,24 @@ read_ip () {
     ip=$ip_read
 }
 user_name=""
-read_user () {
+function read_user () {
     echo_quest "Nome do USER existente em $ct_name"
     read user_name_read
 
     [[ -z $user_name_read ]] && exit 1
-    
-    exists_user $user_name_read
-    
-    [[ $? != "0" ]] && echo_error "Usuario $user_name_read inexistente" && exit 1
-
     user_name=$user_name_read
-    USER_EXEC 'sudo echo "Sou $USER, com uid $UID"'
 }
-
 function post_from () {
     echo_info "Iniciando"
-    lxc stop $ct_name &>/dev/null
     lxc start $ct_name &>/dev/null
+    # lxc stop $ct_name &>/dev/null
     
     read_user
+
+    exists_user $user_name
+    [[ $? != "0" ]] && echo_error "Usuario $user_name_read inexistente" && exit 1
+    USER_EXEC 'sudo echo "Sou $USER, com uid $UID"'
+    
     install_rsync
     
     
@@ -141,30 +115,20 @@ function post_from () {
 function FROM () {
     back_to_local_path
     # Cria conteiner e attach network, no caso do container ainda nao existir
+    # lxc launch $1 $ct_name
+    
+    # Network
     exists_container $ct_name
     if [[ $? == "0" ]]
     then
         echo_info "Usando o container $ct_name, existente."
-    # else
-        # COMENTADOOOOO
-        # lxc image show $1 &>/dev/null || lxc image copy images:$1 local:
-
-        
-        # Cria container
-        # lxc launch $1 $ct_name -c security.privileged=true
-        lxc launch $1 $ct_name &>/dev/null 
-        if [[ ! -z $network ]]
-        then
-            # lxc stop $ct_name
-            # lxc start $ct_name
-            until_host $ct_name
-            echo_info "[ creanting network if ] $network"
-            lxc network create $network &>/dev/null 
-            # lxc network set $network 
-            # sleep 5    
-            echo_info "[ attaching network if ] $network"
-            lxc network attach $network $ct_name &>/dev/null 
-        fi
+        lxc stop $ct_name &>/dev/null
+        lxc start $ct_name &>/dev/null
+    else
+        echo_info "Criando container $ct_name"
+        lxc launch $1 $ct_name &>/dev/null
+        lxc restart $ct_name
+        attach_network
     fi
     post_from
 }

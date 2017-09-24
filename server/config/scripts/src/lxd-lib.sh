@@ -82,6 +82,6 @@ function upgrade () {
     lxc exec $ct_name -- bash -c "apt-get -y upgrade"
 }
 function install () {
-    echo_info "instalando: $*"
+    echo_info "install: $*"
     lxc exec $ct_name -- bash -c "apt-get -y install $*"
 }

@@ -129,7 +129,7 @@ PasswordAuthentication no
 
 Match User root
     PasswordAuthentication yes"
-echo_quest "Cole no final do arquivo:"
+echo_quest "Cole no final do arquivo, depois salve e saia do editor:"
 echo_code "vi /etc/ssh/sshd_config #(note a letra 'd', no 'sshd_config'.)"
 echo_info "(Se houver 'X11Forwarding yes', troque pra 'X11Forwarding no'."
 echo_info ""

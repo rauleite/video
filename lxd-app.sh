@@ -18,10 +18,10 @@ web_vm="/var/www"
 server_vm="~/server"
 
 # Imagem usada como base
-FROM ubuntu/user
+FROM app/node850/npm530/nginx/redis
 
-# Seta um ou multiples diretorios raizes, onde os apps se localizam, 
-# com OWNER e GROUP do usuario da vm (container) destino.
+# Seta um ou multiples diretorios raizes, geralmente onde o(s)  path(s) do(s)
+# app(s) se localizam. Estes recebem OWNER e GROUP do usuario da vm (container) destino.
 ENV $web_vm $server_vm
 
 # Build ou Updates na VM - Executaveis na frente, libs (caso haja, por ultimo)
@@ -64,4 +64,7 @@ EXEC "cd $server_vm && yarn show"
 # EXEC "nginx -t -c /etc/nginx/nginx.conf"
 EXEC "sudo service nginx restart"
 # Remove temp files
-EXEC "sudo rm -r $server_vm/src"
+EXEC "rm -r $server_vm/src"
+# Remove src das instalacoes
+EXEC "cd ~/ && sudo rm -r n netdata/ redis-stable redis-stable.tar.gz"
+EXEC "ls -lha"
