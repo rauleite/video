@@ -1,7 +1,7 @@
 #!/bin/bash
-# Informacoes sobre o framework em lxd-app.sh
+# Informacoes sobre o framework em lxf-app.sh
 
-source ./server/config/lxd/src/lxd-file-src.sh
+source lxf-file-lib.sh
 
 ### MY VARS ###
 db_vm="/db"
@@ -12,8 +12,8 @@ FROM ubuntu/user
 ENV $db_vm
 
 FILES \
-    "$db_local/config/lxd-files/db.sh" \
-    "$db_local/config/lxd-files/z-src.sh"
+    "$db_local/config/lxf-files/db.sh" \
+    "$db_local/config/lxf-files/z-src.sh"
 
 EXEC "sudo rm -f $db_local/config/mongo/data/db/mongod.lock"
 

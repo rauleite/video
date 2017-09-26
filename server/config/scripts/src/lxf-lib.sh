@@ -1,31 +1,6 @@
 #!/bin/bash
-### COLORS ###
-brown='\033[0;33m'
-red='\033[1;31m'
-cyan='\e[36m'
-green='\e[32m'
-blue='\e[34m'
-light_gray='\e[37m'
-gray='\e[90m'
-ligh_green='\e[92m'
-nc='\033[0m' # No Color
 
-### ECHO ###
-function echo_info () {
-    echo -e "${gray}$*${nc}"
-}
-function echo_quest () {
-    echo -e "${cyan}$*${nc}"
-}
-function echo_command () {
-    echo -e "${cyan}$*${nc}"
-}
-function echo_error () {
-    echo -e "${red}$*${nc}"
-}
-function echo_code () {
-    echo -e "${green}$*${nc}"
-}
+source lxf-colors.sh
 
 ### TRAP ###
 function ct_restart() {
@@ -40,8 +15,27 @@ trap ct_restart INT
 
 ### EXEC ###
 function exec_cmd_user () {
-    echo_info "$* (force run with user)"
+    echo_info "$* (run with user)"
     lxc exec $ct_name -- sudo -H -u $user_name bash -c "$*"
+}
+function exec_cmd_user_ssh () {
+    echo_info "$* (run with user via ssh)"
+    # lxc exec $ct_name -- sudo -H -u $user_name bash -c "$*"
+    ip=""
+    cmd=""
+    first="true"
+    for i in $@
+    do
+        if [[ i == 1 ]]
+        then
+            ip=$i
+        else
+            cmd="$dest $i"
+        fi
+    done
+    
+    ssh $user_name@$1 "$cmd"
+
 }
 function exec_cmd () {
     echo_info "$*"
@@ -50,7 +44,9 @@ function exec_cmd () {
 ### UTILS ###
 function until_host () {
     echo "Conectando: $1"
-    exec_cmd "until nc -vzw 2 $1 22; do sleep 1; done"    
+    # exec_cmd "until nc -vzw 2 $1 22; do sleep 1; done"    
+    exec_cmd "until ping -c1 $1 &>/dev/null; do sleep 1; done"
+    sleep 3
     echo "Ok"
 }
 function exists () {
@@ -62,10 +58,17 @@ function exists_user () {
 function exists_container () {
     lxc config show $1 &>/dev/null
 }
-function rsync_sudo () {
+function copy_ssh () {
     # rsync -r -a -e ssh --delete-during --chown=$user_name:$user_name --rsync-path="sudo rsync" $*
-    echo_info "copiando: $*"
+    echo_info "transferindo (ssh): $*"
     rsync -r -a -e ssh --chown=$user_name:$user_name --rsync-path="sudo rsync" $*
+}
+function copy () {
+    echo_info "transferindo (cp): $*"
+    # echo_info " |-> para        : $1"
+    sudo rsync -r -a --chown=$user_name:$user_name --rsync-path="sudo rsync" $*
+    
+    # sudo -H -u $user_name bash -c "sudo cp -rf --remove-destination -t $1 $2"
 }
 
 ### UPDATE, UPGRADE, INSTALL ###

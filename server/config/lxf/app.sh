@@ -1,6 +1,8 @@
 #!/bin/bash
 # Estara na mesma raiz remota (também)
-source ~/z-src.sh
+source /dest-src/z-src.sh
+
+essentials
 
 ### ADD REPO ### -------------------
 ### nginx ###

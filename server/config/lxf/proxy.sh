@@ -1,4 +1,7 @@
 #!/bin/bash
+
+essentials
+
 echo "level 2 - Van Chase"
 add_ppa () {
     grep ^ /etc/apt/sources.list /etc/apt/sources.list.d/* | grep $1 > /dev/null 2>&1

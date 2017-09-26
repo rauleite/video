@@ -5,9 +5,9 @@ tar_basename="config.tar.gz"
 gpg_config="$tar_basename""_$now.gpg"
 remote_path_gdrive="Projetos/access/videoaulas/Arquivos"
 
-echo "Está na raiz do projeto? [Yn]"
-read ok
-[[ $ok =~ ^[nN][[:blank:]]*$ ]] && exit 1 || echo "Blz..."
+# echo "Está na raiz do projeto? [Yn]"
+# read ok
+# [[ $ok =~ ^[nN][[:blank:]]*$ ]] && exit 1 || echo "Blz..."
 
 function instalar_rclone () {
     echo "Não há rclone', deseja instalar a ultima versao e prosseguir? [Yn]"
@@ -42,7 +42,7 @@ function rollback () {
 
 rclone -v ls remote:$remote_path_gdrive
 
-echo "Digite o nome do arquivo a ser baixado:"
+echo "Copie e cole o nome do arquivo a ser baixado:"
 read gpg_config_restore
 echo "Blz..."
 
@@ -51,13 +51,13 @@ rclone -v copy remote:$remote_path_gdrive/$gpg_config_restore $tmp/ || rollback 
 gpg2 --output $tar_basename --decrypt $tmp/$gpg_config_restore || rollback "GPG"
 sudo rm $tmp/$gpg_config_restore
 
-echo "Baixado, já deseja descompactar e sobreescrever?" [Yn]
+echo "Baixado, já deseja descompactar (se estiver na raiz do projeto vai sobrescrever os diretorios e arquivos atuais)?" [Yn]
 read sobreescrever
 [[ $sobreescrever =~ ^[nN][[:blank:]]*$ ]] && exit 0
 
-sudo tar -zxvf $tar_basename server/config/ web/config/ || rollback "TAR"
+sudo tar -zxvf $tar_basename server/config/ www/config/ || rollback "TAR"
 
-echo "Remove $tar_basename da raiz? [Yn]"
+echo "Remove o arquivo $tar_basename? [Yn]"
 read ok
 [[ $ok =~ ^[nN][[:blank:]]*$ ]] && exit 0
 

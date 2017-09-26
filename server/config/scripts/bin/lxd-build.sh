@@ -5,13 +5,13 @@
 # mas principalmente as configuracoes, como criar novo usuario, deletar o 
 # anterior padrao (ubuntu), deixar ssh server configurado, com sua devida chave
 # 
-# Diferenca pro comando lxd-<container>.sh eh que este outro, serve pra buids
+# Diferenca pro comando lxf-<container>.sh eh que este outro, serve pra buids
 # esclusivos de perfil de maquina, como db, proxy, webapp. Ele eh para ser usado
 # na sequencia apos este build.
 # 
 # Pode rodar em container existente, para criacao de novo usuario
 
-source lxd-lib.sh
+source lxf-lib.sh
 
 if [ $EUID == "0" ];
 then
