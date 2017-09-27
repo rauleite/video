@@ -1,1 +1,3 @@
-source real-lib-lxf.sh
+#!/bin/bash
+source real-lib-lxf.sh $@
+# source real-lib-lxf.sh.x

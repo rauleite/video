@@ -51,11 +51,14 @@ PATH=$PATH:$APP_SH_PATH/bin:$APP_SH_PATH/src
 1. Clonar repo do projeto
     * `git clone https://github.com/rauleite/video`
 
+## Extras
+* Compilar todos no mesmo diretorio:
+  * `ls | awk '{print;}' | xargs -I{} shc -f {}`
+* Remover compilados
+  * `rm lxf-*.sh.x*`
 
 
-
-
-
+---
 ## Configuracoes antigas pre LXD ----------
 
 1. Usar versões de node indicado em *./package.json*.

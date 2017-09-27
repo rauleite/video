@@ -1,15 +1,22 @@
 #!/bin/bash
 source lxf-colors.sh
 
-file=$1
-msg_error=""
+declare file=$1
+declare msg_error
+declare NO_FILE
 
 usage () {
-    echo_error "$msg_error"
+    [[ ! -z $msg_error ]] && echo_error "$msg_error"
     echo_info "Usage:"
     echo_command "lxf <file>"
     echo_info "Ex.: arquivo 'lxf-app.sh': lxf lxf-app.sh | lxf app | lxf lxf-app | lxf app.sh"
+    echo ""    
+    echo_info "Opts:"
+    echo_command "-n (no file)  Desconsidera sessao [ FILE ] e [ FILE_SSH ] "
+    echo_info "Ex.: lxf app -n"
+    
 }
+
 function get_file() {
 
     if [[ -z $file ]]
@@ -53,14 +60,21 @@ function get_file() {
 function lexico () {
     ### Analise de lexico ###
     keywords=( \
+        "CONTAINER" \
+        "COPY" \
         "COPY_SSH" \
         "DEST_PATH" \
         "ENV" \
+        "EXEC" \
         "EXEC_SSH" \
         "FILES" \
         "FILES_SSH" \
         "FROM" \
         "HOST_EXEC" \
+        "IPV4" \
+        "NETWORK" \
+        "PRIVILEGED" \
+        "USER_NAME" \
         "VAR" \
     )
 
@@ -77,7 +91,7 @@ function lexico () {
         # line Trim
         line="$(echo -e "${line}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
 
-        # Aceita \ como que continua na linha de baixo
+        # Aceita '\' como que continua na linha de baixo
         last_char=${line##* }
         if [[ $last_char == "\\" ]]
         then
@@ -91,7 +105,7 @@ function lexico () {
         # word Trim
         file_key_word="$(echo -e "${file_key_word}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
 
-        # Linha em branco
+        # Ignora linha em branco ou comentarios
         [[ -z $file_key_word || ${file_key_word:0:1} == "#" ]] && continue
         
         for (( j=0; j<=$keywords_length; j++ ))
@@ -112,6 +126,23 @@ function lexico () {
 
 get_file
 lexico
+
+# Shifts arg <lxc-file>
+shift
+
+while getopts "hn" arg; do
+    case ${arg} in
+        h)
+            usage
+            exit 0
+            ;;
+        n)
+            NO_FILE="true"
+            echo_info "Desconsiderando [ FILE ]"
+            # NO_FILE=$OPTARG
+        ;;
+    esac
+done
 
 source lxf-file-lib.sh
 source $file_to_source

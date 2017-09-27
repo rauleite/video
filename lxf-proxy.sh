@@ -1,16 +1,17 @@
 #!/bin/bash
-# Config
-NETWORK="lxcbr01"
-IMAGE_FROM="ubuntu/user"
-### Dependencia ###
-# namefile=$(basename "$0")
+CONTAINER   "proxy"
+NETWORK     "lxcbr01"
+USER_NAME   "rleite"
+IPV4        "" # Como IPV4 nao tem valor, sera inserido interativamente
+PRIVILEGED  "true"
+DEST_PATH   "/var/lib/lxd/storage-pools/zfs/containers"
 
-source lxf-file-lib.sh
+VAR dest "/home/$USER_NAME/src_dest"
 
-### MY VARS ###
+# FROM ubuntu/user
+FROM proxy/ha
 
-FROM $IMAGE_FROM
-
-### Dependencia ###
-# Instala e Inicia server
-# EXEC ""
+FILES \
+    "./server/config/lxf/proxy.sh" \
+    "./server/config/lxf/z-src.sh" \
+    "$dest"

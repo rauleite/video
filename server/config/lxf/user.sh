@@ -1,9 +1,7 @@
 #!/bin/bash
 # sleep 2
-source /dest-src/z-src.sh
+source ./z-src.sh
 
-update
-apt-get upgrade
 apt-get install -y build-essential
 apt-get install -y openssh-server
 apt-get install -y perl-modules
@@ -92,6 +90,8 @@ vi /home/$user_name/.ssh/authorized_keys
 
 chmod 700 /home/$user_name/.ssh
 chmod 600 /home/$user_name/.ssh/authorized_keys
+chown -R $user_name:$user_name /home/$user_name/.ssh/
+chmod g+s /home/$user_name/.ssh
 
 service sshd restart
 sshd -t

@@ -1,5 +1,5 @@
 #!/bin/bash
-source /dest-src/z-src.sh
+source ./z-src.sh
 
 essentials
 

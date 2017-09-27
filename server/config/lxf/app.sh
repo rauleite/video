@@ -1,6 +1,6 @@
 #!/bin/bash
 # Estara na mesma raiz remota (também)
-source /dest-src/z-src.sh
+source ./z-src.sh
 
 essentials
 
