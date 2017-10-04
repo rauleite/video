@@ -25,22 +25,22 @@
 
     "clean:app": "run-p clean:web clean:server",
     
-    "web":    "cd ./web && cross-env NODE_ENV=development PORT=3001 && yarn start",
-    "server": "cd ./server && export NODE_ENV=development PORT=3000 && yarn dev",
+    "web":    "cd ./www && cross-env NODE_ENV=development PORT=3001 && yarn start",
+    "server": "cd ./server && cross-env NODE_ENV=development PORT=3000 && yarn dev",
     
-    "install:web":    "cd ./web && yarn install",
+    "install:web":    "cd ./www && yarn install",
     "install:server": "cd ./server && yarn install",
     "install:prod":   "yarn install && yarn install:web && yarn build:server",
     
-    "build:web":    "cd ./web && yarn build",
+    "build:web":    "cd ./www && yarn build",
     "build:server": "cd ./server && npm run build",
     "build:app":    "run-p build:web build:server",
     
-    "clean:web":    "shx rm -rf web/build",
+    "clean:web":    "shx rm -rf www/build",
     "clean:server": "shx rm -rf server/build",
 
     "uninstall:root":    "shx rm -rf node_modules yarn.lock",
-    "uninstall:web":     "yarn clean:web && shx rm -rf web/node_modules web/yarn.lock",
+    "uninstall:web":     "yarn clean:web && shx rm -rf www/node_modules www/yarn.lock",
     "uninstall:server":  "yarn clean:server && shx rm -rf server/node_modules server/yarn.lock",
     "uninstall:app":     "yarn uninstall:web && yarn uninstall:server && yarn uninstall:root"
   }

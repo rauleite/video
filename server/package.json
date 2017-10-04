@@ -10,7 +10,7 @@
   },
   
   "scripts": {
-    "dev":          "nodemon -w src --exec \"babel-node src --presets es2015,stage-0\"",
+    "dev":          "export MONGO_HOST=db && nodemon -w src --exec \"babel-node src --presets es2015,stage-0\"",
     "build":        "babel src -s -D -d build --presets es2015,stage-0",
     "start":        "sudo pm2 start ecosystem.config.js --only app",
     "restart":      "sudo pm2 restart ecosystem.config.js --only app",

@@ -101,3 +101,8 @@ essentials
 echo_info "Maquina pronta, pra acessar: "
 echo_info "ssh $user_name@ip.da.vm.aqui"
 echo_info "Como proximo passo, pode ser que voce queira publicar este conteiner como imagem, criei um script pra auxiliar nisto tambem."
+
+rm /var/lib/apt/lists/lock
+rm /var/cache/apt/archives/lock
+rm /var/lib/dpkg/lock
+dpkg --configure -a

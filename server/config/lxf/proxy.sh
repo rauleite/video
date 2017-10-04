@@ -1,21 +1,22 @@
 #!/bin/bash
 source ./z-src.sh
 
-essentials
+# installs
+exists "haproxy"
+if [[ $? != 0 ]]
+then
+    sudo apt-get install -y haproxy
+fi
 
-### ADD REPO ### -------------------
-add_ppa ppa:chris-lea/redis-server
-
-# installs    
-apt-get install -y haproxy
-apt-get install -y redis-server
-apt-get install -y ufw
+exists "ufw"
+if [[ $? != 0 ]]
+then
+    sudo apt-get install -y ufw
+fi
 
 # Habilita on startup
-systemctl enable haproxy.service
-systemctl enable redis-server.service
-systemctl enable ufw.service
+sudo systemctl enable haproxy.service
+sudo systemctl enable ufw.service
 
 echo "[ haproxy ]   $(haproxy -v)"
-echo "[ redis ]     $(redis-server -v)"
 echo "[ ufw ]       $(ufw --version)"

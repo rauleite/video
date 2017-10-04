@@ -25,15 +25,27 @@ function echo_code () {
     echo -e "${green}$*${nc}"
 }
 
+until_host_nc () {
+    until nc -vzw 2 $1 22; do sleep 1; done    
+}
+until_host_ping () {
+    until ping -c1 $1; do sleep 1; done
+}
 update () {
     echo_info 'Conectando: archive.ubuntu.com'
+    until ping -c1 archive.ubuntu.com; do sleep 1; done
     until nc -vzw 2 archive.ubuntu.com 22; do sleep 1; done    
 
     echo_info "Ok"
     echo_info 'Conectando: security.ubuntu.com'    
+
+    until ping -c1 security.ubuntu.com; do sleep 1; done    
     until nc -vzw 2 security.ubuntu.com 22; do sleep 1; done        
     echo_info "Ok"
+    sudo apt-get -y upgrade
     sudo apt-get update
+    sudo apt-get -y upgrade
+
 }
 add_ppa () {
     grep ^ /etc/apt/sources.list /etc/apt/sources.list.d/* | grep $1 > /dev/null 2>&1
@@ -77,8 +89,9 @@ function instala_netdata () {
 }
 
 function essentials () {
+
+    echo_code "Rodando com usuario: $USER"
     update
-    sudo apt-get -y upgrade
     ### ifconfig ###
     sudo apt-get install -y net-tools 
     ### add-apt-repository ###
@@ -90,5 +103,11 @@ function essentials () {
     sudo apt-get install -y curl
     sudo apt-get install -y ufw
     sudo apt-get install -y openssh-server
-    instala_netdata
+    # instala_netdata
 }
+
+echo_info "Remove lock"
+sudo rm /var/lib/apt/lists/lock
+sudo rm /var/cache/apt/archives/lock
+sudo rm /var/lib/dpkg/lock
+sudo dpkg --configure -a
